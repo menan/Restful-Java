@@ -39,7 +39,7 @@ public class SDA {
 	 * defines the home page content
 	 */
 	public SDA() {
-		name = "COMP4601 Searchable Document Archive";
+		name = "COMP4601 Searchable Document Archive V2: Menan and Abdul";
 		collection = new DocumentCollection();
 	}
 	/**
