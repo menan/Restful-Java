@@ -1,4 +1,4 @@
-package edu.carleton.COMP4601.assignment1;
+package edu.carleton.COMP4601.assignment2;
 
 import java.util.ArrayList;
 import java.util.Map;

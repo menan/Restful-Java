@@ -1,4 +1,4 @@
-package edu.carleton.COMP4601.assignment1.Main;
+package edu.carleton.COMP4601.assignment2.Main;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -18,8 +18,8 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import edu.carleton.COMP4601.assignment1.*;
-import edu.carleton.COMP4601.assignment1.persistence.DocumentsManager;
+import edu.carleton.COMP4601.assignment2.*;
+import edu.carleton.COMP4601.assignment2.persistence.DocumentsManager;
 
 @Path("/sda")
 public class SDA {

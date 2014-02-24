@@ -1,4 +1,4 @@
-package edu.carleton.COMP4601.assignment1.persistence;
+package edu.carleton.COMP4601.assignment2.persistence;
 
 
 import java.net.UnknownHostException;

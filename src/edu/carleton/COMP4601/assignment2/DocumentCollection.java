@@ -1,4 +1,4 @@
-package edu.carleton.COMP4601.assignment1;
+package edu.carleton.COMP4601.assignment2;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,8 +12,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
-import edu.carleton.COMP4601.assignment1.Document;
-import edu.carleton.COMP4601.assignment1.persistence.DocumentsManager;
+import edu.carleton.COMP4601.assignment2.Document;
+import edu.carleton.COMP4601.assignment2.persistence.DocumentsManager;
 
 @XmlRootElement
 @XmlAccessorType(XmlAccessType.FIELD)
