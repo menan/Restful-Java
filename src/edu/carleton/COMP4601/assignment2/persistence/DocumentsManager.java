@@ -1,4 +1,4 @@
-package edu.carleton.COMP4601.assignment2.persistence;
+package edu.carleton.comp4601.assignment2.persistence;
 
 
 import java.util.ArrayList;
@@ -13,7 +13,7 @@ import com.mongodb.DBCursor;
 import com.mongodb.WriteConcern;
 import com.mongodb.WriteResult;
 
-import edu.carleton.COMP4601.assignment2.Document;
+import edu.carleton.comp4601.assignment2.dao.*;
 
 
 public class DocumentsManager extends AbstractMongoDBManager {
