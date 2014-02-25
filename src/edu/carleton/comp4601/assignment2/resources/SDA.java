@@ -143,7 +143,18 @@ public class SDA {
 		return returnStr;
 	}
 	
-	
+
+//	@GET
+//	@Path("pagerank")
+//	@Produces(MediaType.TEXT_HTML)
+//	public String listServices() throws UnknownHostException {
+//		String returnStr = SearchServiceManager.getInstance().list().size() + " service(s) found: <br />";
+//		for(ServiceInfo info: SearchServiceManager.getInstance().list()){
+//			returnStr = returnStr.concat("<a href=\"http://" + info.getInetAddresses()[0].toString() + ":8080/COMP4601A2/rest/sda\">" + info.getName() + "</a><br />");
+//		}
+//		return returnStr;
+//	}
+//	
 	@GET
 	@Path("search/{tags}")
 	@Produces(MediaType.APPLICATION_XML)

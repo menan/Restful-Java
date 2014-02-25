@@ -40,8 +40,11 @@ import Jama.Matrix;
 
 
 import edu.carleton.comp4601.assignment2.dao.Document;
+import edu.carleton.comp4601.assignment2.dao.DocumentCollection;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
+import edu.carleton.comp4601.assignment2.persistence.GraphManager;
 import edu.carleton.comp4601.assignment2.persistence.LuceneManager;
+import edu.carleton.comp4601.assignment2.utility.Marshaller;
 
 public class CustomWebCrawler extends WebCrawler {
 
@@ -53,8 +56,7 @@ public class CustomWebCrawler extends WebCrawler {
     
     private final static Pattern FILTERS_TIKA = Pattern.compile(".*(\\.(jpeg|tiff|gif|png|pdf|doc|docx|xls|xlsx|ppt|pptx))$");
     
-	public static UndirectedGraph<String, DefaultEdge> graph;
-	private static DirectedGraph<URL, DefaultEdge> g = new DefaultDirectedGraph<URL, DefaultEdge>(DefaultEdge.class);
+	private static DirectedGraph<Integer, DefaultEdge> g = new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
 
     /**
      * You should implement this function to specify whether
@@ -97,7 +99,9 @@ public class CustomWebCrawler extends WebCrawler {
                     
                     
                     String html = htmlParseData.getHtml();
-                    
+
+                    int docID = page.getWebURL().getDocid();
+                    int parentDocID = page.getWebURL().getParentDocid();
 
                     org.jsoup.nodes.Document jDoc	=	Jsoup.parse(html.toString());
             		String title = jDoc.select("title").first().text();
@@ -118,6 +122,7 @@ public class CustomWebCrawler extends WebCrawler {
             		System.out.println("Text Size:" +  text.length());
             		System.out.println("Link Size" +  links.size());
             		System.out.println("Tags Size:" +  tags.size());
+        	        System.out.println("docid:" + page.getWebURL().getDocid());
             		
             		
             		
@@ -135,20 +140,14 @@ public class CustomWebCrawler extends WebCrawler {
             			System.out.println("There was an error creating the document");
 
 
-//            		boolean graphed = graph(Integer.toString(page.getWebURL().getDocid()), page.getWebURL().getParentUrl());
             		
-					try {
-						graph(new URL(url),new URL(page.getWebURL().getParentUrl()));
+            		
+            		boolean graphed = graph(docID, parentDocID);
+
+            		if(graphed)
             			System.out.println("Just graphed too.");
-					} catch (MalformedURLException e) {
-            			System.out.println("There was an error graphing the document: " + e.getMessage());
-//						e.printStackTrace();
-					}
-            		
-//            		if(graphed)
-//            			System.out.println("Just graphed too.");
-//            		else
-//            			System.out.println("There was an error graphing the document");
+            		else
+            			System.out.println("There was an error graphing the document");
 
 //            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
 
@@ -186,6 +185,7 @@ public class CustomWebCrawler extends WebCrawler {
 	        System.out.println("Type:" + metadata.get(HttpHeaders.CONTENT_TYPE));
 	        System.out.println("Title:" + metadata.get("title"));
 	        System.out.println("Text:" + text);
+	        System.out.println("docid:" + weburl.getDocid());
 	        System.out.println("Metadata:" + metadata.toString());
 	        
 	        String title = "";
@@ -230,61 +230,51 @@ public class CustomWebCrawler extends WebCrawler {
         
     }
 
-	public static Graph<String, DefaultEdge> getInstanceOfGraph(){
-		if(graph == null){
-			graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
-		}
-		return graph;
-	}
-
-
-    public boolean graph(String docid, String parent_url){
-    	
-    	boolean returnValue = false;
-		// ----- Graph -----
-		// - Add vertex
-		if (!getInstanceOfGraph().containsVertex(docid)) {
-			getInstanceOfGraph().addVertex(docid);
-			returnValue = true;
-		}
-		// - Add edge
-		if (parent_url != null) {
-			List<DBObject> seachResult = DocumentsManager.getDefault().search("url",parent_url, true);
-			if (seachResult != null && seachResult.size() > 0) {
-				getInstanceOfGraph().addEdge(seachResult.get(0).get("id").toString(),docid);
-				returnValue = true;
-			}
-		}
+    public static void calculatePageRank(){
+		DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
 		
-		return returnValue;
-    }
-    
-    
-    public static UndirectedGraph<String, DefaultEdge> getGraph(){
-    	return graph;
+		for(int v: newG.vertexSet()){
+			System.out.println("vertex: " + v + ", rank:" + pageRank(v));
+		}
     }
     
     public static boolean storeGraph(){
-    	//to be implemented 
-    	System.out.println("Graph:");
-    	System.out.println(g.toString());
+    	GraphManager.getDefault().save(g);
+		System.out.println("and its saved to the DB as bytes :)");
     	return true;
     }
     
-
-    public boolean graph(URL curent_url, URL parent_url){
-
-        // add the vertices
-		g.addVertex(curent_url);
-		g.addVertex(parent_url);
-		// add edges to create linking structure
-		g.addEdge(curent_url, parent_url);
+    
+    public static void printGraph(){
+		DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
+		System.out.println("Graph fetched from the db is:");
+		System.out.println(newG);
 		
-		g.
+		pageRank(0);
 		
-		return true;
-
     }
+    
+    public static int pageRank(int docID){
+    	DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
+//		System.out.println("Out degree of " + docID  + " is :" + newG.outDegreeOf(docID));
+		return newG.outDegreeOf(docID);
+    }
+
+    public boolean graph(int currentDocID, int prentDocID){
+
+		g.addVertex(currentDocID);
+    	if (prentDocID == -1){
+    		g.addVertex(0);
+    	}
+		g.addVertex(currentDocID);
+		g.addVertex(prentDocID);
+		g.addEdge(prentDocID, currentDocID);
+		
+
+		return true;
+    }
+    
+    
     public static void searchFor(String query){
     	LuceneManager.getDefault().search(query, 2);
     }

@@ -38,12 +38,18 @@ public class Controller {
                  * Start the crawl. This is a blocking operation, meaning that your code
                  * will reach the line after this only when crawling is finished.
                  */
-                controller.start(CustomWebCrawler.class, numberOfCrawlers);
                 
-                controller.waitUntilFinish();
-                System.out.println("Finished Crawling!");
                 
-                CustomWebCrawler.storeGraph();
+//                controller.start(CustomWebCrawler.class, numberOfCrawlers);
+//                
+//                controller.waitUntilFinish();
+//                System.out.println("Finished Crawling!");
+//
+//                CustomWebCrawler.storeGraph();
+                
+                
+                CustomWebCrawler.calculatePageRank();
+                
                 
                 CustomWebCrawler.searchFor("3004");
 

@@ -109,6 +109,7 @@ public class DocumentsManager extends AbstractMongoDBManager {
 		
 		return save(a);
 	}
+	
 	public boolean create(Document d) {
 		return save(d);
 	}
