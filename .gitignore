@@ -5,7 +5,7 @@
 .classpath
 .project
 .settings/
-/build
+build/
 .dll
 *.exe
 *.o
