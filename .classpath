@@ -56,8 +56,6 @@
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/metadata-extractor-2.4.0-beta-1.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/servlet-api.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/tagsoup-1.2.1.jar"/>
-	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/tika-core-1.0.jar"/>
-	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/tika-parsers-1.0.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/tomcat-api.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/tomcat-coyote.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/tomcat-dbcp.jar"/>
@@ -71,8 +69,9 @@
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/lucene-core-4.6.1.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/tika-app-1.4.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/jsoup-1.7.3.jar"/>
-	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/mongo-java-driver-2.9.3.jar"/>
-	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601Assignment1-100770296/WebContent/WEB-INF/lib/mongo-java-driver-2.11.3.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/jmdns.jar"/>
+	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/mongo-java-driver-2.11.3.jar"/>
+	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/lucene-analyzers-common-4.6.1.jar"/>
+	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2-100770296/lib/lucene-queryparser-4.6.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

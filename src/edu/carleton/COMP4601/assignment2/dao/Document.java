@@ -5,8 +5,14 @@ import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
+import com.mongodb.BasicDBObject;
+
 @XmlRootElement
-public class Document {
+public class Document extends BasicDBObject{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private Integer score;
 	private String name;

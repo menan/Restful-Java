@@ -15,8 +15,8 @@ public class Controller {
                 CrawlConfig config = new CrawlConfig();
                 config.setCrawlStorageFolder(crawlStorageFolder);
                 config.setPolitenessDelay(5);
-                config.setMaxDepthOfCrawling(5);
-        		config.setMaxPagesToFetch(50);
+                config.setMaxDepthOfCrawling(-1);
+        		config.setMaxPagesToFetch(-1);
 
                 /*
                  * Instantiate the controller for this crawl.

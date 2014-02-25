@@ -1,32 +1,56 @@
 package edu.carleton.comp4601.assignment2.crawler;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
+import org.apache.lucene.index.IndexWriter;
+import org.apache.lucene.index.IndexWriterConfig;
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
+import org.apache.lucene.store.RAMDirectory;
+import org.apache.lucene.util.Version;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.io.TikaInputStream;
+import org.apache.tika.metadata.HttpHeaders;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.AutoDetectParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
+import org.apache.tika.sax.ToHTMLContentHandler;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
+//import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-
-import com.mongodb.BasicDBObject;
+import org.xml.sax.SAXException;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
+import edu.carleton.comp4601.assignment2.dao.Document;
+import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
 
 public class CustomWebCrawler extends WebCrawler {
 
 
-    private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|bmp|gif|jpe?g" 
-                                                      + "|png|tiff?|mid|mp2|mp3|mp4"
+    private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|java|jar" 
+                                                      + "|mid|mp2|mp3|mp4"
                                                       + "|wav|avi|mov|mpeg|ram|m4v|pdf" 
                                                       + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
+    
+    private final static Pattern FILTERS_TIKA = Pattern.compile(".*(\\.(jpeg|tiff|gif|png|pdf|doc|docx|xls|xlsx|ppt|pptx))$");
     
 	private static DirectedGraph<URL, DefaultEdge> g = new DefaultDirectedGraph<URL, DefaultEdge>(DefaultEdge.class);
     /**
@@ -36,13 +60,19 @@ public class CustomWebCrawler extends WebCrawler {
      */
     @Override
     public boolean shouldVisit(WebURL url) {
-//    	System.out.println("Not sure if I should visit: " + url.toString());
-            String href = url.getURL().toLowerCase();
+        String href = url.getURL().toLowerCase();
+        if (FILTERS_TIKA.matcher(href).matches()){
+			parseDoc(url);
+        	return false;
+        }
+        else{
+
             return !FILTERS.matcher(href).matches()
-            		&& (href.startsWith("http://www.carleton.ca/")
+            		&& (href.contains("carleton.ca/")
             		|| href.startsWith("http://sikaman.dyndns.org:8888/courses/")
-            		|| href.startsWith("http://people.scs.carleton.ca/~jeanpier/"))
-            		;
+            		|| href.startsWith("http://people.scs.carleton.ca/~jeanpier/"));
+        }
+            
     }
 
     /**
@@ -56,96 +86,131 @@ public class CustomWebCrawler extends WebCrawler {
     		
             if (page.getParseData() instanceof HtmlParseData) {
                     HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+                    
+                    
                     String html = htmlParseData.getHtml();
-            		Document jDoc	=	Jsoup.parse(html.toString());
-            		Element artistName = jDoc.select("div#artist_infos > h3").first();
-            		Elements genre_from = jDoc.select("div#artist_infos > p > a");
+                    
 
-            		Element views = jDoc.select("div#artist_stats_box > p > strong").first();
-            		Element plays = jDoc.select("div#artist_stats_box > p > strong").last();
+                    org.jsoup.nodes.Document jDoc	=	Jsoup.parse(html.toString());
+            		String title = jDoc.select("title").first().text();
+            		Elements textE = jDoc.select("p");
+            		Elements linksE = jDoc.select("a");
+            		String text = jDoc.select("body").first().text();
             		
-            		Element email = jDoc.select("div#artist_contacts_box > p > script").first();
-            		Elements websites = jDoc.select("div#artist_contacts_box > p > a");
-
-            		Element bio = jDoc.select("div#artist_biography_content").first();
-
-            		Element image = jDoc.select("div#artist_image > img").first();
-            		Elements comments = jDoc.select("div.user_comment");
-            		
-            		
-            		String imgageURL = "http://www.unsigned.com" + image.attr("src");
-            		
-            		String emailStr = "";
-            		
-            		if(email != null){
-            			emailStr = sanitizeEmails(email.html());
-            		}
-            		else{
-            			System.out.println("Email is nil tho");
-            		}
-            		
-            		ArrayList<String>  genre = new ArrayList<String>();
-            		ArrayList<String>  from = new ArrayList<String>();
-            		
-            		for	(Element	link	:	genre_from)	{
-            			if (link.attr("href").contains("countries")){
-            				from.add(link.text().replace(" ", ""));
-            			}
-            			else{
-            				genre.add(link.text());
-            			}
-        			}
-
-            		ArrayList<String> urls = new ArrayList<String>();
-            		for	(Element	w	:	websites)	{
-            			urls.add(w.text());
-        			}
-            		
-            		if (artistName != null){
-
-                		String username = page.getWebURL().getPath().substring(1);
-                		
-                		BasicDBObject doc = new BasicDBObject("docid", page.getWebURL().getDocid());
-                		doc.append("username", username);
-                		doc.append("genre", genre);
-                		doc.append("from", from);
-                		doc.append("no_of_views", views.text());
-                		doc.append("no_of_plays", plays.text());
-                		doc.append("no_of_comments", comments.size());
-                		doc.append("email", emailStr);
-                		doc.append("websites", urls);
-                		doc.append("bio", bio.text());
-                		doc.append("image", imgageURL);
-
-                		System.out.println("artist name: " + artistName.text());
-                		System.out.println("username: " + username);
-                		System.out.println("genre: " + genre.toString());
-                		System.out.println("from: " + from.toString());
-                		System.out.println("total views: " + views.text());
-                		System.out.println("total plays: " + plays.text());
-                		System.out.println("Number of Comments: " + comments.size());
-                		System.out.println("Email: " + emailStr);
-                		System.out.println("Websites: " + urls.toString());
-                		System.out.println("Bio: " + bio.text());
-                		System.out.println("Image: " + imgageURL);
-
-                		
-                		//save the document here
-                		System.out.println("=============================");
-            		}
-            		else{
-            			System.out.println("Artist name is nil tho");
+            		ArrayList<String> tags = new ArrayList<String>();
+            		ArrayList<String> links = new ArrayList<String>();
+            		for(Element t : textE){
+            			tags.add(t.text());
             		}
 
+            		for(Element l : linksE){
+            			links.add(l.text());
+            		}
+            		System.out.println("Title:" +  title);
+            		System.out.println("Text Size:" +  text.length());
+            		System.out.println("Link Size" +  links.size());
+            		System.out.println("Tags Size:" +  tags.size());
+            		
+            		
+            		
+            		Document d = new Document(page.getWebURL().getDocid());
+            		d.setLinks(links);
+            		d.setName(title);
+            		d.setTags(tags);
+            		d.setText(text);
+            		
+            		boolean created = DocumentsManager.getDefault().create(d);
+            		
+            		if(created)
+            			System.out.println("Document created successfully");
+            		else
+            			System.out.println("There was an error creating the document");
+            		
+                    //... to be implemented
+            		System.out.println("_____________=========-------==========-------========__________");
             }
     }
     
-    public String sanitizeEmails(String html)
-    {
-		return html.substring(16,html.length()-3).replace(", ", "@").replace("'", "");
-    	
+    public void parseDoc(WebURL weburl){
+		URL url;
+		InputStream input;
+		try {
+			url = new URL(weburl.getURL());
+			input = TikaInputStream.get(url);
+
+	        ToHTMLContentHandler toHTMLHandler = new ToHTMLContentHandler();
+	        
+			Metadata	metadata	=	new	Metadata();	
+			ParseContext	context	=	new	ParseContext();	
+			Parser parser	=	 new AutoDetectParser();	
+
+			parser.parse(input,	toHTMLHandler,	metadata,	context);
+
+            org.jsoup.nodes.Document jDoc	=	Jsoup.parse(toHTMLHandler.toString());
+			
+    		String text = metadata.toString() + jDoc.select("body").first().text();
+
+        	System.out.println("Gonna parse url: " + weburl.getURL());
+        	
+	        System.out.println("Type:" + metadata.get(HttpHeaders.CONTENT_TYPE));
+	        System.out.println("Title:" + metadata.get("title"));
+	        System.out.println("Text:" + text);
+	        System.out.println("Metadata:" + metadata.toString());
+	        
+	        String title = "";
+	        if(metadata.get("title") != null)
+	        	title = metadata.get("title");
+        	else
+        		title = weburl.getURL();
+
+    		Document d = new Document(weburl.getDocid());
+    		d.setName(title);
+    		d.setText(text);
+    		
+    		boolean created = DocumentsManager.getDefault().create(d);
+    		
+    		if(created)
+    			System.out.println("Parsed document created successfully");
+    		else
+    			System.out.println("There was an error creating the Parsed document");
+    		
+            //... to be implemented
+			
+		}
+		catch (IOException | SAXException | TikaException e) {
+			e.printStackTrace();
+		}
+		System.out.println("_____________=========-------==========-------========__________");
+        
     }
     
+    
+    public void indexToLucene(Document d, String url){
+    	StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_46);
+    	Directory index = new RAMDirectory();
+
+    	IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46, analyzer);
+
+    	IndexWriter w;
+		try {
+			w = new IndexWriter(index, config);
+	    	addDoc(w, "Lucene in Action", "193398817");
+	    	addDoc(w, "Lucene for Dummies", "55320055Z");
+	    	addDoc(w, "Managing Gigabytes", "55063554A");
+	    	addDoc(w, "The Art of Computer Science", "9900333X");
+	    	w.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+    	
+    }
+    private static void addDoc(IndexWriter w, String title, String isbn) throws IOException {
+    	org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
+    	  doc.add(new TextField("title", title, Field.Store.YES));
+    	  doc.add(new StringField("isbn", isbn, Field.Store.YES));
+    	  w.addDocument(doc);
+	}
     public static DirectedGraph<URL, DefaultEdge> getGraph(){
     	return g;
     }

@@ -20,7 +20,7 @@ public class DocumentsManager extends AbstractMongoDBManager {
 
 	private static DocumentsManager manager;
 	private static String DEFAULT_DB = "sda";
-	private static String DEFAULT_COLLECTION = "documents";
+	private static String DEFAULT_COLLECTION = "index";
 	
 	
 	/**
@@ -108,6 +108,9 @@ public class DocumentsManager extends AbstractMongoDBManager {
 		a.setLinks(new ArrayList<String>(Arrays.asList(links.split(" "))));
 		
 		return save(a);
+	}
+	public boolean create(Document d) {
+		return save(d);
 	}
 
 	
