@@ -73,6 +73,7 @@ public class LuceneManager {
     public boolean addDocument(Document d) {
 		try {
 	    	writer.addDocument(d);
+	    	writer.close();
 	    	return true;
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -82,29 +83,28 @@ public class LuceneManager {
     
     
     
-    public ScoreDoc[] search(String query, int thisHitsPerPage) throws IOException, ParseException{
-    	Directory dir = FSDirectory.open(new File(luceneStorageFolder));
-    	QueryParser parser = new QueryParser(Version.LUCENE_46, field, analyzer);
-    	Query q = parser.parse(query);
-
-    	IndexReader reader = DirectoryReader.open(dir);
-
-    	IndexSearcher searcher = new IndexSearcher(reader);
-    	
-    	TopDocs results = searcher.search(q, 5 * thisHitsPerPage);
-    	System.out.println("Searching for: " + query.toString());
-    	
-    	ScoreDoc[] hits = results.scoreDocs;
-    	
-    	for(int i = 0; i < hits.length; i++){
-    		int docId = hits[i].doc;
-    		Document d = searcher.doc(docId);
-    		System.out.println(d.get("filename"));
-    	}
-
-		System.out.println(hits.length + " resuts found");
-		
-		return hits;
+    public ScoreDoc[] search(String query, int thisHitsPerPage){
+    	Directory dir;
+		try {
+			dir = FSDirectory.open(new File(luceneStorageFolder));
+	    	QueryParser parser = new QueryParser(Version.LUCENE_46, field, analyzer);
+	    	Query q = parser.parse(query);
+	    	IndexReader reader = DirectoryReader.open(dir);
+	    	IndexSearcher searcher = new IndexSearcher(reader);
+	    	TopDocs results = searcher.search(q, 5 * thisHitsPerPage);
+	    	System.out.println("Searching for: " + query.toString());
+	    	ScoreDoc[] hits = results.scoreDocs;
+	    	for(int i = 0; i < hits.length; i++){
+	    		int docId = hits[i].doc;
+	    		Document d = searcher.doc(docId);
+	    		System.out.println(d.get("filename"));
+	    	}
+			System.out.println(hits.length + " resuts found");
+			return hits;
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+			return null;
+		}
     	 
     }
 

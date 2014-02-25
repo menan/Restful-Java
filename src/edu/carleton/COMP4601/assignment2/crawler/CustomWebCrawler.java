@@ -191,5 +191,9 @@ public class CustomWebCrawler extends WebCrawler {
     public static DirectedGraph<URL, DefaultEdge> getGraph(){
     	return g;
     }
+    
+    public static void searchFor(String query){
+    	LuceneManager.getDefault().search(query, 2);
+    }
 
 }
