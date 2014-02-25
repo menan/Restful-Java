@@ -7,6 +7,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
 import org.apache.tika.exception.TikaException;
@@ -52,13 +55,53 @@ public class CustomWebCrawler extends WebCrawler {
 
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|java|jar" 
                                                       + "|mid|mp2|mp3|mp4"
-                                                      + "|wav|avi|mov|mpeg|ram|m4v|pdf" 
+                                                      + "|wav|avi|mov|mpeg|ram|m4v" 
                                                       + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
     
     private final static Pattern FILTERS_TIKA = Pattern.compile(".*(\\.(jpeg|tiff|gif|png|pdf|doc|docx|xls|xlsx|ppt|pptx))$");
     
-	private static DirectedGraph<Integer, DefaultEdge> g = new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+	private DirectedGraph<Integer, DefaultEdge> g;
 
+	public static long MIN_POLITNESS_TIME_IN_MS = 200;
+
+	public static long MAX_POLITNESS_TIME_IN_MS = 150000; // 2.5 min
+
+	public static long MAX_TIME_TO_WAIT_IN_SEC = 60; // 1 min
+
+	
+	private Map<String, Duration > durationsToVisitDomains;
+
+	/**
+	 * Before starting crawling, the onStart() method is called.
+	 * You may initialize some local variables if you like. 
+	 */
+	@Override
+	public void onStart() {
+		durationsToVisitDomains = new ConcurrentHashMap< String, Duration >();
+		g = new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+	}
+	
+	/**
+	 * Before ending crawling, the onBeforeExit() method is called.
+	 * You may initialize some local variables if you like. 
+	 */
+    @Override
+    public void onBeforeExit(){
+    	storeGraph();
+    	calculatePageRank();
+    }
+	
+    /**
+     * This function is called once the header of a page is fetched.
+     * It can be overwritten by sub-classes to perform custom logic
+     * for different status codes. For example, 404 pages can be logged, etc.
+     */
+    @Override
+    protected void handlePageStatusCode(WebURL webUrl, int statusCode, String statusDescription) {
+    	startingVisit(webUrl.getURL());
+    }
+
+    
     /**
      * You should implement this function to specify whether
      * the given url should be crawled or not (based on your
@@ -68,22 +111,16 @@ public class CustomWebCrawler extends WebCrawler {
     public boolean shouldVisit(WebURL url) {
         String href = url.getURL().toLowerCase();
 //        System.out.println("Not sure if I should visit " + href);
-            if (!FILTERS.matcher(href).matches() && (href.contains("carleton.ca/") ||
-            		href.startsWith("http://sikaman.dyndns.org:8888/courses/") ||
-        			href.startsWith("http://people.scs.carleton.ca/~jeanpier/"))){
-
-              if (FILTERS_TIKA.matcher(href).matches()){
+		if (!FILTERS.matcher(href).matches()
+				&& (href.contains("carleton.ca/")
+						|| href.startsWith("http://sikaman.dyndns.org:8888/courses/") || href
+							.startsWith("http://people.scs.carleton.ca/~jeanpier/"))) {
+			if (FILTERS_TIKA.matcher(href).matches()) {
       			parseDoc(url);
-              	return false;
-              }
-              else{
-                  return true;
-              }
-            }
-            else{
-            	return false;
-            }
-            
+			}
+			return true;
+		}
+		return false;
     }
 
     /**
@@ -156,18 +193,23 @@ public class CustomWebCrawler extends WebCrawler {
 //            			System.out.println("Document indexed to the lucene successfully");
 //            		else
 //            			System.out.println("There was an error indexing the document");
-            		
-                    //... to be implemented
-            		System.out.println("_____________=========-------==========-------========__________");
-            }
+            		endingVisit(url);
+
+            		// ... to be implemented
+            		System.out.println("_____________=========-------==========-------========__________");	
+		} 
+
     }
     
     public void parseDoc(WebURL weburl){
 		URL url;
 		InputStream input;
+		String url_string = weburl.getURL();
 		try {
-			url = new URL(weburl.getURL());
+			url = new URL(url_string);
 			input = TikaInputStream.get(url);
+
+			Integer docid = myController.getDocIdServer().getNewDocID(url_string);
 
 	        ToHTMLContentHandler toHTMLHandler = new ToHTMLContentHandler();
 	        
@@ -185,8 +227,8 @@ public class CustomWebCrawler extends WebCrawler {
         	
 	        System.out.println("Type:" + metadata.get(HttpHeaders.CONTENT_TYPE));
 	        System.out.println("Title:" + metadata.get("title"));
-	        System.out.println("Text:" + text);
-	        System.out.println("docid:" + weburl.getDocid());
+	       // System.out.println("Text:" + text);
+	        System.out.println("docid:" + docid);
 	        System.out.println("Metadata:" + metadata.toString());
 	        
 	        String title = "";
@@ -195,7 +237,7 @@ public class CustomWebCrawler extends WebCrawler {
         	else
         		title = weburl.getURL();
 
-    		Document d = new Document(weburl.getDocid());
+    		Document d = new Document(docid);
     		d.setName(title);
     		d.setText(text);
     		
@@ -227,14 +269,16 @@ public class CustomWebCrawler extends WebCrawler {
 		catch (IOException | SAXException | TikaException e) {
 			e.printStackTrace();
 		}
+		
+    	endingVisit(url_string);
 		System.out.println("_____________=========-------==========-------========__________");
         
     }
 
-    public static void calculatePageRank(){
-		DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
+    public void calculatePageRank(){
+//		DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
 		
-		for(int v: newG.vertexSet()){
+		for(int v: g.vertexSet()){
 			System.out.println("vertex: " + v + ", rank:" + pageRank(v));
 			boolean updated = DocumentsManager.getDefault().updateScore(v, pageRank(v));
 			if(updated)
@@ -247,26 +291,26 @@ public class CustomWebCrawler extends WebCrawler {
 		}
     }
     
-    public static boolean storeGraph(){
+    public boolean storeGraph(){
     	GraphManager.getDefault().save(g);
 		System.out.println("and its saved to the DB as bytes :)");
     	return true;
     }
     
     
-    public static void printGraph(){
-		DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
+    public void printGraph(){
+//		DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
 		System.out.println("Graph fetched from the db is:");
-		System.out.println(newG);
+		System.out.println(g);
 		
 		pageRank(0);
 		
     }
     
-    public static int pageRank(int docID){
-    	DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
+    public int pageRank(int docID){
+//    	DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
 //		System.out.println("Out degree of " + docID  + " is :" + newG.outDegreeOf(docID));
-		return newG.outDegreeOf(docID);
+		return g.outDegreeOf(docID);
     }
 
     public boolean graph(int currentDocID, int prentDocID){
@@ -287,5 +331,67 @@ public class CustomWebCrawler extends WebCrawler {
     public static void searchFor(String query){
     	LuceneManager.getDefault().search(query, 2);
     }
+    
+    protected void startingVisit(String url){
+    	if(myController.getDocIdServer().isSeenBefore(url)){
+//        	System.out.println("MyCrawler - "+url);
+    	}
+		durationsToVisitDomains.put(url, new Duration());
+		long start = System.nanoTime();
+		durationsToVisitDomains.get(url).setStartTime(start);
+
+    }
+    
+    protected void endingVisit(String url){
+		long end = System.nanoTime();
+        Duration d = durationsToVisitDomains.get(url);
+        if(d != null){
+	        d.setEndTime(end);
+	        int visit_duration = d.getDurationInSec();
+	        long delay_nextTime_ms = d.getTimeToWaitInMilliseconds(visit_duration);
+        	myController.getPageFetcher().getConfig().setPolitenessDelay((int) delay_nextTime_ms);
+        	System.out.println("URL: "+url+" took ("+visit_duration+" sec) to process :: wait: "+delay_nextTime_ms+" ms before visiting next time");
+        }
+    }
+
+    
+    protected class Duration
+    {
+        private long startTime;
+        private long endTime;
+
+        public Duration(){
+        	
+        }
+
+        public Duration(long start_time, long end_time)
+        {
+        	startTime   = start_time;
+        	endTime = end_time;
+        }
+
+        public long getStartTime()   { return startTime; }
+        public long getEndTime() { return endTime; }
+        public void setStartTime(long start_time)   { startTime = start_time; }
+        public void setEndTime(long end_time)   { endTime = end_time; }
+
+        public int getDurationInSec() { 
+        	long elapsedTime = endTime - startTime;
+        	return (int)  TimeUnit.SECONDS.convert(elapsedTime, TimeUnit.NANOSECONDS);
+        }
+        
+        
+        public long getTimeToWaitInMilliseconds(int durationTookToVisit_Sec) {
+        	long timeToWait = durationTookToVisit_Sec * 10;
+        	if(timeToWait <= 0){
+        		return MIN_POLITNESS_TIME_IN_MS;
+        	}
+        	else if(timeToWait > MAX_TIME_TO_WAIT_IN_SEC){
+        		return MAX_POLITNESS_TIME_IN_MS;
+        	}
+        	return TimeUnit.MILLISECONDS.convert(timeToWait, TimeUnit.SECONDS);
+        }
+    }
+
 
 }
