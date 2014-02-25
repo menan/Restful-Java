@@ -7,13 +7,13 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 public class Controller {
-		
+	public static String CRAWL_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp";
+
         public static void main(String[] args) throws Exception {
-                String crawlStorageFolder = "/Volumes/My Passport/School/workspace/data/crawler/root";
                 int numberOfCrawlers = 1;
 
                 CrawlConfig config = new CrawlConfig();
-                config.setCrawlStorageFolder(crawlStorageFolder);
+                config.setCrawlStorageFolder(CRAWL_DIR);
                 config.setPolitenessDelay(5);
                 config.setMaxDepthOfCrawling(-1);
         		config.setMaxPagesToFetch(50);
