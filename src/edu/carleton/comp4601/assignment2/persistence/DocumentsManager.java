@@ -155,7 +155,7 @@ public class DocumentsManager extends AbstractMongoDBManager {
 		doc.put("text", a.getText());
 		doc.put("tags", a.getTags());
 		doc.put("links", a.getLinks());
-		doc.put("score", a.getScore());
+		doc.put("score", 0);
 		
 		if(collection != null){
 			return collection.insert(doc, WriteConcern.SAFE);

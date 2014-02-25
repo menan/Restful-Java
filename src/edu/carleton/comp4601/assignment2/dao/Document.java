@@ -26,11 +26,13 @@ public class Document extends BasicDBObject{
 		tags = new ArrayList<String>();
 		links = new ArrayList<String>();
 		metadata = new HashMap<String, Object>();
+		score = 0;
 	}
 
 	public Document(Integer id) {
 		this();
 		this.id = id;
+		score = 0;
 	}
 
 	@SuppressWarnings("unchecked")

@@ -187,12 +187,13 @@ public class CustomWebCrawler extends WebCrawler {
             		else
             			System.out.println("There was an error graphing the document");
 
-//            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
+            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
 
-//            		if(indexed)
-//            			System.out.println("Document indexed to the lucene successfully");
-//            		else
-//            			System.out.println("There was an error indexing the document");
+            		if(indexed)
+            			System.out.println("Document indexed to the lucene successfully");
+            		else
+            			System.out.println("There was an error indexing the document");
+            		
             		endingVisit(url);
 
             		// ... to be implemented
@@ -314,16 +315,15 @@ public class CustomWebCrawler extends WebCrawler {
     }
 
     public boolean graph(int currentDocID, int prentDocID){
-
-		g.addVertex(currentDocID);
     	if (prentDocID == -1){
-    		g.addVertex(0);
+    		prentDocID = 0;
     	}
-		g.addVertex(currentDocID);
+
 		g.addVertex(prentDocID);
+		g.addVertex(currentDocID);
+		
 		g.addEdge(prentDocID, currentDocID);
 		
-
 		return true;
     }
     
