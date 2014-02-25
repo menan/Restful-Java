@@ -10,7 +10,8 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 public class Controller {
 //	public static String CRAWL_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp";
-	public static String CRAWL_DIR = "/Volumes/My Passport/School/workspace/data/root";
+//	public static String CRAWL_DIR = "/Volumes/My Passport/School/workspace/data/crawler/root";
+	public static String CRAWL_DIR = "/Users/dynasty/Documents/workspace/data/crawler/root";
 
 	public static void main(String[] args) throws Exception {
 		int numberOfCrawlers = 3;
@@ -38,9 +39,9 @@ public class Controller {
 		config2.setMaxDepthOfCrawling(2);
 		config3.setMaxDepthOfCrawling(1);
 
-		config1.setMaxPagesToFetch(10);
-		config2.setMaxPagesToFetch(10);
-		config3.setMaxPagesToFetch(10);
+		config1.setMaxPagesToFetch(5);
+		config2.setMaxPagesToFetch(5);
+		config3.setMaxPagesToFetch(5);
 
 
 		

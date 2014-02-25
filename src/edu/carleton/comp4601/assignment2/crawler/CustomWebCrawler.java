@@ -57,18 +57,11 @@ public class CustomWebCrawler extends WebCrawler {
                                                       + "|mid|mp2|mp3|mp4"
                                                       + "|wav|avi|mov|mpeg|ram|m4v" 
                                                       + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
-    
     private final static Pattern FILTERS_TIKA = Pattern.compile(".*(\\.(jpeg|tiff|gif|png|pdf|doc|docx|xls|xlsx|ppt|pptx))$");
-    
 	private DirectedGraph<Integer, DefaultEdge> g;
-
 	public static long MIN_POLITNESS_TIME_IN_MS = 200;
-
 	public static long MAX_POLITNESS_TIME_IN_MS = 150000; // 2.5 min
-
 	public static long MAX_TIME_TO_WAIT_IN_SEC = 60; // 1 min
-
-	
 	private Map<String, Duration > durationsToVisitDomains;
 
 	/**
@@ -187,12 +180,12 @@ public class CustomWebCrawler extends WebCrawler {
             		else
             			System.out.println("There was an error graphing the document");
 
-            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
-
-            		if(indexed)
-            			System.out.println("Document indexed to the lucene successfully");
-            		else
-            			System.out.println("There was an error indexing the document");
+//            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
+//
+//            		if(indexed)
+//            			System.out.println("Document indexed to the lucene successfully");
+//            		else
+//            			System.out.println("There was an error indexing the document");
             		
             		endingVisit(url);
 
@@ -294,7 +287,8 @@ public class CustomWebCrawler extends WebCrawler {
     
     public boolean storeGraph(){
     	GraphManager.getDefault().save(g);
-		System.out.println("and its saved to the DB as bytes :)");
+		System.out.println("The finished version of the graph:");
+		System.out.println(g);
     	return true;
     }
     
@@ -311,7 +305,7 @@ public class CustomWebCrawler extends WebCrawler {
     public int pageRank(int docID){
 //    	DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
 //		System.out.println("Out degree of " + docID  + " is :" + newG.outDegreeOf(docID));
-		return g.outDegreeOf(docID);
+		return g.inDegreeOf(docID);
     }
 
     public boolean graph(int currentDocID, int prentDocID){
@@ -329,7 +323,7 @@ public class CustomWebCrawler extends WebCrawler {
     
     
     public static void searchFor(String query){
-    	LuceneManager.getDefault().search(query, 2);
+    	LuceneManager.getDefault().query(query);
     }
     
     protected void startingVisit(String url){

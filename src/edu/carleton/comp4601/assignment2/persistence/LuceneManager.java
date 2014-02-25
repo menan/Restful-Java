@@ -36,7 +36,8 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 public class LuceneManager {
 
 //	public static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
-	public static String INDEX_DIR = "/Volumes/My Passport/School/workspace/data/lucene/root";
+//	public static String INDEX_DIR = "/Volumes/My Passport/School/workspace/data/lucene/root";
+	public static String INDEX_DIR = "/Users/dynasty/Documents/workspace/data/lucene/root";
 	
 	
 	
@@ -126,7 +127,7 @@ public class LuceneManager {
 		writer.addDocument(doc);
 	}
     
-	public ArrayList<edu.carleton.comp4601.assignment2.dao.Document>	query(String searchString) {
+	public ArrayList<edu.carleton.comp4601.assignment2.dao.Document> query(String searchString) {
 		try {
 			IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(INDEX_DIR)));
 			searcher = new IndexSearcher(reader);
@@ -177,10 +178,12 @@ public class LuceneManager {
 
     public boolean addDocument(Document d) {
 		try {
+			System.out.println("adding document to index:" + d.get(DOC_ID));
 	    	writer.addDocument(d);
 	    	writer.close();
 	    	return true;
 		} catch (IOException e) {
+			System.out.println("Error adding document to index:" + d.get(DOC_ID));
 			e.printStackTrace();
 			return false;
 		}

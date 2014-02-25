@@ -156,7 +156,7 @@ public class SDA {
 //	}
 //	
 	@GET
-	@Path("search/{tags}")
+	@Path("query/{tags}")
 	@Produces(MediaType.APPLICATION_XML)
 	public List<Document> searchDocuments(@PathParam("tags") String tags) throws UnknownHostException {
 		List<Document> resultsDoc = new ArrayList<Document>();
@@ -173,7 +173,7 @@ public class SDA {
 	 */
 	
 	@GET
-	@Path("search/{tags}")
+	@Path("query/{tags}")
 	@Produces(MediaType.TEXT_HTML)
 	public String searchDocumentsHTML(@PathParam("tags") String tags) throws UnknownHostException {
 		if (tags == null || tags.isEmpty()){
@@ -317,9 +317,9 @@ public class SDA {
 //	 * @param id
 //	 * @return
 //	 */
-//	@Path("{doc}")
-//	public Action getDocument(@PathParam("doc") String id) {
-//		return new Action(uriInfo, request, id, collection);
-//	}
+	@Path("{doc}")
+	public Action getDocument(@PathParam("doc") String id) {
+		return new Action(uriInfo, request, id, collection);
+	}
 
 }
