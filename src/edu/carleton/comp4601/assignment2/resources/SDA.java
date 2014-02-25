@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.jmdns.ServiceInfo;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
@@ -20,6 +22,7 @@ import javax.ws.rs.core.UriInfo;
 
 import edu.carleton.comp4601.assignment2.dao.*;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
+import edu.carleton.comp4601.assignment2.utility.SearchServiceManager;
 
 @Path("/sda")
 public class SDA {
@@ -121,8 +124,23 @@ public class SDA {
 
 	@GET
 	@Path("reset")
+	@Produces(MediaType.TEXT_HTML)
 	public String resetDocuments() throws UnknownHostException {
-		return "Done";
+		if (collection.reset())
+			return "Reseting done successfully";
+		else
+			return "Sorry but there was an error while reseting the documents archive";
+	}
+
+	@GET
+	@Path("list")
+	@Produces(MediaType.TEXT_HTML)
+	public String listServices() throws UnknownHostException {
+		String returnStr = SearchServiceManager.getInstance().list().size() + " services found: <br />";
+		for(ServiceInfo info: SearchServiceManager.getInstance().list()){
+			returnStr = returnStr.concat("<a href=\"" + info.getInetAddresses().toString() + "\">" + info.getName() + "</a><br />");
+		}
+		return returnStr;
 	}
 	
 	

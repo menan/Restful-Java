@@ -13,6 +13,7 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import edu.carleton.comp4601.assignment2.dao.Document;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
+import edu.carleton.comp4601.assignment2.persistence.LuceneManager;
 
 
 @XmlRootElement
@@ -127,5 +128,9 @@ public class DocumentCollection {
 	 */
 	public void setDocuments(List<Document> documents) {
 		this.documents = documents;
+	}
+	
+	public boolean reset(){
+		return DocumentsManager.getDefault().deleteAll() && LuceneManager.getDefault().reset();
 	}
 }

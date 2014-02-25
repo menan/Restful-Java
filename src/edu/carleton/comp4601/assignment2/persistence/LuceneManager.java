@@ -38,7 +38,7 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 
 public class LuceneManager {
 
-	public static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+	public static String INDEX_DIR = "/Volumes/My Passport/School/workspace/data/lucene/root";
 	
 	int hitsPerPage = 10;
 	
@@ -210,6 +210,16 @@ public class LuceneManager {
 			return null;
 		}
     	 
+    }
+    
+    public boolean reset(){
+    	try {
+			writer.deleteAll();
+	    	return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
     }
 
 

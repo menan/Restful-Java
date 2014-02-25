@@ -7,7 +7,7 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 public class Controller {
-	public static String CRAWL_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp";
+	public static String CRAWL_DIR = "/Volumes/My Passport/School/workspace/data/crawler/root";
 
         public static void main(String[] args) throws Exception {
                 int numberOfCrawlers = 1;

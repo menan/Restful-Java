@@ -59,9 +59,7 @@ public class CustomWebCrawler extends WebCrawler {
         else{
 
             return !FILTERS.matcher(href).matches()
-            		&& (href.contains("carleton.ca/")
-            		|| href.startsWith("http://sikaman.dyndns.org:8888/courses/")
-            		|| href.startsWith("http://people.scs.carleton.ca/~jeanpier/"));
+            		&& (href.contains("carleton.ca/") || href.startsWith("http://sikaman.dyndns.org:8888/courses/") || href.startsWith("http://people.scs.carleton.ca/~jeanpier/"));
         }
             
     }
