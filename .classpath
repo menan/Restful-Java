@@ -13,7 +13,6 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
-<<<<<<< HEAD
 	<classpathentry kind="lib" path="/Users/abdulrahmanalamoudi/Documents/Studying/COMP/5th Year/Winter 2013/COMP4601/Code/COMP4601A2/lib/annotations-api.jar"/>
 	<classpathentry kind="lib" path="/Users/abdulrahmanalamoudi/Documents/Studying/COMP/5th Year/Winter 2013/COMP4601/Code/COMP4601A2/lib/apache-mime4j-core-0.7.jar"/>
 	<classpathentry kind="lib" path="/Users/abdulrahmanalamoudi/Documents/Studying/COMP/5th Year/Winter 2013/COMP4601/Code/COMP4601A2/lib/apache-mime4j-dom-0.7.jar"/>
@@ -74,65 +73,5 @@
 	<classpathentry kind="lib" path="/Users/abdulrahmanalamoudi/Documents/Studying/COMP/5th Year/Winter 2013/COMP4601/Code/COMP4601A2/lib/websocket-api.jar"/>
 	<classpathentry kind="lib" path="/Users/abdulrahmanalamoudi/Documents/Studying/COMP/5th Year/Winter 2013/COMP4601/Code/COMP4601A2/lib/mongo-java-driver-2.11.3.jar"/>
 	<classpathentry kind="lib" path="/Users/abdulrahmanalamoudi/Documents/Studying/COMP/5th Year/Winter 2013/COMP4601/Code/COMP4601A2/lib/jmdns.jar"/>
-=======
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/commons-compress-1.3.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/commons-logging-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/annotations-api.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/apache-mime4j-core-0.7.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/apache-mime4j-dom-0.7.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/asm-3.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/boilerpipe-1.1.0.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/catalina-ha.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/catalina-tribes.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/catalina-ant.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/commons-codec-1.6.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/catalina.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/crawler4j-3.5.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/ecj-4.2.2.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/el-api.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/geronimo-stax-api_1.0_spec-1.0.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/httpclient-4.2.3.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/httpcore-4.2.2.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jackson-core-asl-1.9.2.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jackson-jaxrs-1.9.2.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jackson-mapper-asl-1.9.2.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jackson-xc-1.9.2.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jasper-el.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jasper.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/je-4.0.92.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jersey-client-1.17.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jersey-core-1.17.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jersey-json-1.17.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jersey-server-1.17.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jersey-servlet-1.17.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jettison-1.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jgraph-5.13.0.0.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jgrapht-core-0.9.0.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jgrapht-demo-0.9.0.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jgrapht-ext-0.9.0-uber.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jgrapht-ext-0.9.0.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jgraphx-2.0.0.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jsoup-1.7.3.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jsp-api.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/jsr311-api-1.1.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/log4j-1.2.14.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/metadata-extractor-2.4.0-beta-1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/mongo-java-driver-2.11.3.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/servlet-api.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tagsoup-1.2.1.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tika-core-1.0.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tika-parsers-1.0.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat-api.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat-coyote.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat-dbcp.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat-i18n-es.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat-i18n-fr.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat-i18n-ja.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat-jdbc.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat-util.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/tomcat7-websocket.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601Assignment1-100770296/lib/websocket-api.jar"/>
-	<classpathentry kind="lib" path="/Users/dynasty/Documents/workspace/COMP4601A2/lib/jmdns.jar"/>
->>>>>>> b3e786b2a9ea4a5e9d8bdd04400e537b37ca33a7
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
