@@ -29,6 +29,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.xml.sax.SAXException;
 
+import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -235,6 +236,14 @@ public class CustomWebCrawler extends WebCrawler {
 		
 		for(int v: newG.vertexSet()){
 			System.out.println("vertex: " + v + ", rank:" + pageRank(v));
+			boolean updated = DocumentsManager.getDefault().updateScore(v, pageRank(v));
+			if(updated)
+				System.out.println("updated the score on the database as well");
+			else
+				System.out.println("Error updating the score to the db");
+				
+			
+			
 		}
     }
     

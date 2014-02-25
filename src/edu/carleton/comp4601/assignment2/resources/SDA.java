@@ -309,15 +309,17 @@ public class SDA {
 		}
 		
 	}
-
-	/**
-	 * initializes a document with the parameter id in the url to the Action class for latter usage
-	 * @param id
-	 * @return
-	 */
-	@Path("{doc}")
-	public Action getDocument(@PathParam("doc") String id) {
-		return new Action(uriInfo, request, id, collection);
-	}
+	
+	
+//
+//	/**
+//	 * initializes a document with the parameter id in the url to the Action class for latter usage
+//	 * @param id
+//	 * @return
+//	 */
+//	@Path("{doc}")
+//	public Action getDocument(@PathParam("doc") String id) {
+//		return new Action(uriInfo, request, id, collection);
+//	}
 
 }
