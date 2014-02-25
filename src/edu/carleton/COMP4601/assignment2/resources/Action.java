@@ -1,4 +1,4 @@
-package edu.carleton.comp4601.assignment2.Main;
+package edu.carleton.comp4601.assignment2.resources;
 
 import java.io.FileNotFoundException;
 import java.net.UnknownHostException;

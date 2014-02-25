@@ -17,6 +17,7 @@ public class SDAContextClass implements ServletContextListener {
 
 	public void contextInitialized(ServletContextEvent arg0) {
 		SearchServiceManager.getInstance();
+		System.out.println("server initialized");
 	}
 
 }

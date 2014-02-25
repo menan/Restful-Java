@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <title>Create a new document</title>
+ </head>
+<body>
+<h2>Create a new document</h2>
+  <form action="../COMP4601SDA/rest/sda" method="POST">
+  <table>
+  <tr>
+  	<td><label for="id">ID<font color="red"><sup>*</sup></font></label></td><td><input name="id" id="id" /></td>
+  </tr>
+  <tr>
+  	<td><label for="name">Name<font color="red"><sup>*</sup></font></label></td><td><input name="name" id="name"/></td>
+  </tr>
+  <tr>
+  	<td><label for="tags">Tags<font color="red"><sup>*</sup></font></label></td><td><input name="tags" id="tags" /></td>
+  </tr>
+  <tr>
+  	<td><label for="links">Links</label></td><td><input name="links" id="links" /></td>
+  </tr>
+  <tr>
+  	<td><label for="text">Text</label></td><td><TEXTAREA NAME="text" id="text" COLS=40 ROWS=6></TEXTAREA></td>
+  </tr>
+  <tr>
+  	<td></td><td><input type="submit" value="Submit" /></td>
+  </tr>
+  </table>
+  </form>
+  <font color="red"><sup>*</sup></font> - Must be filled
+</body>
+</html> 

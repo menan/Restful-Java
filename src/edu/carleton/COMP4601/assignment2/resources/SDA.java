@@ -1,4 +1,4 @@
-package edu.carleton.comp4601.assignment2.Main;
+package edu.carleton.comp4601.assignment2.resources;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -118,6 +118,14 @@ public class SDA {
 	 * @throws UnknownHostException
 	 */
 
+
+	@GET
+	@Path("reset")
+	public String resetDocuments() throws UnknownHostException {
+		return "Done";
+	}
+	
+	
 	@GET
 	@Path("search/{tags}")
 	@Produces(MediaType.APPLICATION_XML)

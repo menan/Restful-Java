@@ -51,11 +51,11 @@ public class SearchServiceManager implements Runnable, ServiceListener {
 		String host = addr.getHostName();
 		jmdns = JmDNS.create(addr, host);
 		jmdns.addServiceListener(SEARCH, this);
-		//ServiceInfo[] infos = jmdns.list(SEARCH);
-		//System.out.println("LIST: " + SEARCH);
-		//for (ServiceInfo s : infos) {
-		//	System.out.println(s);
-		//}
+		ServiceInfo[] infos = jmdns.list(SEARCH);
+		System.out.println("LIST: " + SEARCH);
+		for (ServiceInfo s : infos) {
+			System.out.println(s);
+		}
 		
 		// Add this hook in order to ensure that
 		// jmDNS stops properly
@@ -143,17 +143,17 @@ public class SearchServiceManager implements Runnable, ServiceListener {
 	// Assumes that only one service per machine
 	public void serviceAdded(ServiceEvent s) {
 		// services.put(getService(s.getInfo()), s.getInfo());
-		// System.out.println("Added: " + s.getName());
+		 System.out.println("Added: " + s.getName());
 	}
 
 	public void serviceRemoved(ServiceEvent s) {
 		services.remove(getService(s.getInfo()));
-		// System.out.println("Removed: " + s.getName());
+		 System.out.println("Removed: " + s.getName());
 	}
 
 	public void serviceResolved(ServiceEvent s) {
 		services.put(getService(s.getInfo()), s.getInfo());
-		//System.out.println("Resolved: " + s.getName());
+		System.out.println("Resolved: " + s.getName());
 	}
 	
 	public Collection<ServiceInfo> list() {
