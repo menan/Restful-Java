@@ -39,8 +39,6 @@ public class LuceneManager {
 //	public static String INDEX_DIR = "/Volumes/My Passport/School/workspace/data/lucene/root";
 	public static String INDEX_DIR = "/Users/dynasty/Documents/workspace/data/lucene/root";
 	
-	
-	
 	int hitsPerPage = 10;
 	
 	private final static String PATH = "path";
