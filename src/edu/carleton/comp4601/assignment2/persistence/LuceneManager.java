@@ -33,9 +33,6 @@ import org.apache.lucene.store.FSDirectory;
 import edu.carleton.comp4601.assignment2.crawler.Controller;
 
 
-
-//import edu.carleton.comp4601.assignment2.dao.Document;
-
 public class LuceneManager {
 
 	public static String INDEX_DIR = "/Volumes/My Passport/School/workspace/data/lucene/root";
@@ -72,7 +69,6 @@ public class LuceneManager {
     		writer = new IndexWriter(dir, iwc);
     		indexDocuments(writer, docDir);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try{
@@ -166,6 +162,7 @@ public class LuceneManager {
 	
 
     public boolean indexDocument(String url, int i, Date date, String content, String metadata){
+    	System.out.println("trying to index:" + url);
 		Document doc = new Document();
 		doc.add(new TextField("url", url, Field.Store.YES));
 		doc.add(new IntField(DOC_ID, i, Field.Store.YES));

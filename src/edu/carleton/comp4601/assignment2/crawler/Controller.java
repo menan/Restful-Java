@@ -15,8 +15,7 @@ public class Controller {
                 CrawlConfig config = new CrawlConfig();
                 config.setCrawlStorageFolder(CRAWL_DIR);
                 config.setPolitenessDelay(5);
-                config.setMaxDepthOfCrawling(-1);
-        		config.setMaxPagesToFetch(50);
+        		config.setMaxPagesToFetch(20);
 
                 /*
                  * Instantiate the controller for this crawl.
@@ -43,6 +42,9 @@ public class Controller {
                 
                 controller.waitUntilFinish();
                 System.out.println("Finished Crawling!");
+                
+                CustomWebCrawler.storeGraph();
+                
                 CustomWebCrawler.searchFor("3004");
 
 

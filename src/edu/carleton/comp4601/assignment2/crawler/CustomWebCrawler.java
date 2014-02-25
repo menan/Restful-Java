@@ -2,9 +2,11 @@ package edu.carleton.comp4601.assignment2.crawler;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.apache.tika.exception.TikaException;
@@ -16,18 +18,26 @@ import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
 import org.apache.tika.sax.ToHTMLContentHandler;
 import org.jgrapht.DirectedGraph;
+import org.jgrapht.Graph;
+import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.jsoup.Jsoup;
 //import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.xml.sax.SAXException;
 
+import com.mongodb.DBObject;
+
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
+
+import Jama.Matrix;
+
 
 import edu.carleton.comp4601.assignment2.dao.Document;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
@@ -38,12 +48,14 @@ public class CustomWebCrawler extends WebCrawler {
 
     private final static Pattern FILTERS = Pattern.compile(".*(\\.(css|js|java|jar" 
                                                       + "|mid|mp2|mp3|mp4"
-                                                      + "|wav|avi|mov|mpeg|ram|m4v" 
+                                                      + "|wav|avi|mov|mpeg|ram|m4v|pdf" 
                                                       + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
     
     private final static Pattern FILTERS_TIKA = Pattern.compile(".*(\\.(jpeg|tiff|gif|png|pdf|doc|docx|xls|xlsx|ppt|pptx))$");
     
+	public static UndirectedGraph<String, DefaultEdge> graph;
 	private static DirectedGraph<URL, DefaultEdge> g = new DefaultDirectedGraph<URL, DefaultEdge>(DefaultEdge.class);
+
     /**
      * You should implement this function to specify whether
      * the given url should be crawled or not (based on your
@@ -52,15 +64,22 @@ public class CustomWebCrawler extends WebCrawler {
     @Override
     public boolean shouldVisit(WebURL url) {
         String href = url.getURL().toLowerCase();
-        if (FILTERS_TIKA.matcher(href).matches()){
-			parseDoc(url);
-        	return false;
-        }
-        else{
+//        System.out.println("Not sure if I should visit " + href);
+            if (!FILTERS.matcher(href).matches() && (href.contains("carleton.ca/") ||
+            		href.startsWith("http://sikaman.dyndns.org:8888/courses/") ||
+        			href.startsWith("http://people.scs.carleton.ca/~jeanpier/"))){
 
-            return !FILTERS.matcher(href).matches()
-            		&& (href.contains("carleton.ca/") || href.startsWith("http://sikaman.dyndns.org:8888/courses/") || href.startsWith("http://people.scs.carleton.ca/~jeanpier/"));
-        }
+              if (FILTERS_TIKA.matcher(href).matches()){
+      			parseDoc(url);
+              	return false;
+              }
+              else{
+                  return true;
+              }
+            }
+            else{
+            	return false;
+            }
             
     }
 
@@ -109,18 +128,34 @@ public class CustomWebCrawler extends WebCrawler {
             		d.setText(text);
 
             		boolean created = DocumentsManager.getDefault().create(d);
-            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
             		
             		if(created)
             			System.out.println("Document added to the db successfully");
             		else
             			System.out.println("There was an error creating the document");
-            		
 
-            		if(indexed)
-            			System.out.println("Document indexed to the lucene successfully");
-            		else
-            			System.out.println("There was an error indexing the document");
+
+//            		boolean graphed = graph(Integer.toString(page.getWebURL().getDocid()), page.getWebURL().getParentUrl());
+            		
+					try {
+						graph(new URL(url),new URL(page.getWebURL().getParentUrl()));
+            			System.out.println("Just graphed too.");
+					} catch (MalformedURLException e) {
+            			System.out.println("There was an error graphing the document: " + e.getMessage());
+//						e.printStackTrace();
+					}
+            		
+//            		if(graphed)
+//            			System.out.println("Just graphed too.");
+//            		else
+//            			System.out.println("There was an error graphing the document");
+
+//            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
+
+//            		if(indexed)
+//            			System.out.println("Document indexed to the lucene successfully");
+//            		else
+//            			System.out.println("There was an error indexing the document");
             		
                     //... to be implemented
             		System.out.println("_____________=========-------==========-------========__________");
@@ -163,20 +198,30 @@ public class CustomWebCrawler extends WebCrawler {
     		d.setName(title);
     		d.setText(text);
     		
+    		
     		boolean created = DocumentsManager.getDefault().create(d);
-    		boolean indexed = LuceneManager.getDefault().indexDocument(weburl.getURL(), weburl.getDocid(), new Date(), text, metadata.toString());
+
     		
     		if(created)
     			System.out.println("Document added to the db successfully");
     		else
     			System.out.println("There was an error creating the document");
     		
+//    		boolean graphed = graph(Integer.toString(weburl.getDocid()), weburl.getParentUrl());
+//    		if(graphed)
+//    			System.out.println("Just graphed too.");
+//    		else
+//    			System.out.println("There was an error graphing the document");
+    		
+//    		boolean indexed = LuceneManager.getDefault().indexDocument(weburl.getURL(), weburl.getDocid(), new Date(), text, metadata.toString());
 
-    		if(indexed)
-    			System.out.println("Document indexed to the lucene successfully");
-    		else
-    			System.out.println("There was an error indexing the document");
-			
+//    		if(indexed)
+//    			System.out.println("Document indexed to the lucene successfully");
+//    		else
+//    			System.out.println("There was an error indexing the document");
+
+    		
+    		
 		}
 		catch (IOException | SAXException | TikaException e) {
 			e.printStackTrace();
@@ -184,12 +229,62 @@ public class CustomWebCrawler extends WebCrawler {
 		System.out.println("_____________=========-------==========-------========__________");
         
     }
-    
-    
-    public static DirectedGraph<URL, DefaultEdge> getGraph(){
-    	return g;
+
+	public static Graph<String, DefaultEdge> getInstanceOfGraph(){
+		if(graph == null){
+			graph = new SimpleGraph<String, DefaultEdge>(DefaultEdge.class);
+		}
+		return graph;
+	}
+
+
+    public boolean graph(String docid, String parent_url){
+    	
+    	boolean returnValue = false;
+		// ----- Graph -----
+		// - Add vertex
+		if (!getInstanceOfGraph().containsVertex(docid)) {
+			getInstanceOfGraph().addVertex(docid);
+			returnValue = true;
+		}
+		// - Add edge
+		if (parent_url != null) {
+			List<DBObject> seachResult = DocumentsManager.getDefault().search("url",parent_url, true);
+			if (seachResult != null && seachResult.size() > 0) {
+				getInstanceOfGraph().addEdge(seachResult.get(0).get("id").toString(),docid);
+				returnValue = true;
+			}
+		}
+		
+		return returnValue;
     }
     
+    
+    public static UndirectedGraph<String, DefaultEdge> getGraph(){
+    	return graph;
+    }
+    
+    public static boolean storeGraph(){
+    	//to be implemented 
+    	System.out.println("Graph:");
+    	System.out.println(g.toString());
+    	return true;
+    }
+    
+
+    public boolean graph(URL curent_url, URL parent_url){
+
+        // add the vertices
+		g.addVertex(curent_url);
+		g.addVertex(parent_url);
+		// add edges to create linking structure
+		g.addEdge(curent_url, parent_url);
+		
+		g.
+		
+		return true;
+
+    }
     public static void searchFor(String query){
     	LuceneManager.getDefault().search(query, 2);
     }

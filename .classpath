@@ -73,5 +73,6 @@
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2/lib/tomcat-util.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2/lib/tomcat7-websocket.jar"/>
 	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2/lib/websocket-api.jar"/>
+	<classpathentry kind="lib" path="/Volumes/My Passport/School/workspace/COMP4601A2/lib/Jama-1.0.3.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

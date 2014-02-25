@@ -131,6 +131,6 @@ public class DocumentCollection {
 	}
 	
 	public boolean reset(){
-		return DocumentsManager.getDefault().deleteAll() && LuceneManager.getDefault().reset();
+		return DocumentsManager.getDefault().deleteAll(); // && LuceneManager.getDefault().reset();
 	}
 }
