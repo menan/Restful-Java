@@ -35,8 +35,8 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 
 public class LuceneManager {
 
-//	public static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
-	public static String INDEX_DIR = "/Volumes/My Passport/School/workspace/data/lucene/root";
+	public static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+//	public static String INDEX_DIR = "/Volumes/My Passport/School/workspace/data/lucene/root";
 	
 	
 	

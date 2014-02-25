@@ -211,6 +211,7 @@ public class CustomWebCrawler extends WebCrawler {
 			input = TikaInputStream.get(url);
 
 			Integer docid = myController.getDocIdServer().getNewDocID(url_string);
+            int parentDocID = weburl.getParentDocid();
 
 	        ToHTMLContentHandler toHTMLHandler = new ToHTMLContentHandler();
 	        
@@ -251,14 +252,14 @@ public class CustomWebCrawler extends WebCrawler {
     		else
     			System.out.println("There was an error creating the document");
     		
-//    		boolean graphed = graph(Integer.toString(weburl.getDocid()), weburl.getParentUrl());
-//    		if(graphed)
-//    			System.out.println("Just graphed too.");
-//    		else
-//    			System.out.println("There was an error graphing the document");
+    		boolean graphed = graph(docid.intValue(), parentDocID);
+    		if(graphed)
+    			System.out.println("Just graphed too.");
+    		else
+    			System.out.println("There was an error graphing the document");
     		
 //    		boolean indexed = LuceneManager.getDefault().indexDocument(weburl.getURL(), weburl.getDocid(), new Date(), text, metadata.toString());
-
+//
 //    		if(indexed)
 //    			System.out.println("Document indexed to the lucene successfully");
 //    		else
@@ -280,7 +281,7 @@ public class CustomWebCrawler extends WebCrawler {
 //		DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
 		
 		for(int v: g.vertexSet()){
-			System.out.println("vertex: " + v + ", rank:" + pageRank(v));
+			System.out.println("vertex: " + v + "("+"), rank:" + pageRank(v));
 			boolean updated = DocumentsManager.getDefault().updateScore(v, pageRank(v));
 			if(updated)
 				System.out.println("updated the score on the database as well");
