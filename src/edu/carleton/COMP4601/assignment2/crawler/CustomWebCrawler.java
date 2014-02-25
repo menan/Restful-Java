@@ -2,21 +2,11 @@ package edu.carleton.comp4601.assignment2.crawler;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.regex.Pattern;
 
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
-import org.apache.lucene.document.TextField;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.store.RAMDirectory;
-import org.apache.lucene.util.Version;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.HttpHeaders;
@@ -41,6 +31,7 @@ import edu.uci.ics.crawler4j.url.WebURL;
 
 import edu.carleton.comp4601.assignment2.dao.Document;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
+import edu.carleton.comp4601.assignment2.persistence.LuceneManager;
 
 public class CustomWebCrawler extends WebCrawler {
 
@@ -118,13 +109,20 @@ public class CustomWebCrawler extends WebCrawler {
             		d.setName(title);
             		d.setTags(tags);
             		d.setText(text);
-            		
+
             		boolean created = DocumentsManager.getDefault().create(d);
+            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
             		
             		if(created)
-            			System.out.println("Document created successfully");
+            			System.out.println("Document added to the db successfully");
             		else
             			System.out.println("There was an error creating the document");
+            		
+
+            		if(indexed)
+            			System.out.println("Document indexed to the lucene successfully");
+            		else
+            			System.out.println("There was an error indexing the document");
             		
                     //... to be implemented
             		System.out.println("_____________=========-------==========-------========__________");
@@ -168,13 +166,18 @@ public class CustomWebCrawler extends WebCrawler {
     		d.setText(text);
     		
     		boolean created = DocumentsManager.getDefault().create(d);
+    		boolean indexed = LuceneManager.getDefault().indexDocument(weburl.getURL(), weburl.getDocid(), new Date(), text, metadata.toString());
     		
     		if(created)
-    			System.out.println("Parsed document created successfully");
+    			System.out.println("Document added to the db successfully");
     		else
-    			System.out.println("There was an error creating the Parsed document");
+    			System.out.println("There was an error creating the document");
     		
-            //... to be implemented
+
+    		if(indexed)
+    			System.out.println("Document indexed to the lucene successfully");
+    		else
+    			System.out.println("There was an error indexing the document");
 			
 		}
 		catch (IOException | SAXException | TikaException e) {
@@ -185,32 +188,6 @@ public class CustomWebCrawler extends WebCrawler {
     }
     
     
-    public void indexToLucene(Document d, String url){
-    	StandardAnalyzer analyzer = new StandardAnalyzer(Version.LUCENE_46);
-    	Directory index = new RAMDirectory();
-
-    	IndexWriterConfig config = new IndexWriterConfig(Version.LUCENE_46, analyzer);
-
-    	IndexWriter w;
-		try {
-			w = new IndexWriter(index, config);
-	    	addDoc(w, "Lucene in Action", "193398817");
-	    	addDoc(w, "Lucene for Dummies", "55320055Z");
-	    	addDoc(w, "Managing Gigabytes", "55063554A");
-	    	addDoc(w, "The Art of Computer Science", "9900333X");
-	    	w.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-    	
-    }
-    private static void addDoc(IndexWriter w, String title, String isbn) throws IOException {
-    	org.apache.lucene.document.Document doc = new org.apache.lucene.document.Document();
-    	  doc.add(new TextField("title", title, Field.Store.YES));
-    	  doc.add(new StringField("isbn", isbn, Field.Store.YES));
-    	  w.addDocument(doc);
-	}
     public static DirectedGraph<URL, DefaultEdge> getGraph(){
     	return g;
     }
