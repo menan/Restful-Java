@@ -136,9 +136,9 @@ public class SDA {
 	@Path("list")
 	@Produces(MediaType.TEXT_HTML)
 	public String listServices() throws UnknownHostException {
-		String returnStr = SearchServiceManager.getInstance().list().size() + " services found: <br />";
+		String returnStr = SearchServiceManager.getInstance().list().size() + " service(s) found: <br />";
 		for(ServiceInfo info: SearchServiceManager.getInstance().list()){
-			returnStr = returnStr.concat("<a href=\"" + info.getInetAddresses().toString() + "\">" + info.getName() + "</a><br />");
+			returnStr = returnStr.concat("<a href=\"http://" + info.getInetAddresses()[0].toString() + ":8080/COMP4601A2/rest/sda\">" + info.getName() + "</a><br />");
 		}
 		return returnStr;
 	}
