@@ -19,7 +19,7 @@ public class GraphManager extends AbstractMongoDBManager{
 	
 	
 	/**
-	 * Shorten constructor for DocumentsManager where host and port will be substituted by
+	 * Shorten constructor for GraphManager where host and port will be substituted by
 	 * their default values specified in class AbstractMongoDB. Parameter <objectClass>
 	 * can have the value null in case there is no specific class this collection holds 
 	 * into.

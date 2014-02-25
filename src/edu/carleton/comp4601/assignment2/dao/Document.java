@@ -1,6 +1,7 @@
 package edu.carleton.comp4601.assignment2.dao;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlRootElement;
@@ -19,10 +20,12 @@ public class Document extends BasicDBObject{
 	private String text;
 	private ArrayList<String> tags;
 	private ArrayList<String> links;
+	private Map<String,Object> metadata;
 
 	public Document() {
 		tags = new ArrayList<String>();
 		links = new ArrayList<String>();
+		metadata = new HashMap<String, Object>();
 	}
 
 	public Document(Integer id) {
@@ -39,6 +42,7 @@ public class Document extends BasicDBObject{
 		this.text = (String) map.get("text");
 		this.tags = (ArrayList<String>) map.get("tags");
 		this.links = (ArrayList<String>) map.get("links");
+		this.metadata = (Map<String, Object>) map.get("metadata");
 	}
 
 	public Integer getId() {
@@ -87,6 +91,14 @@ public class Document extends BasicDBObject{
 
 	public void setLinks(ArrayList<String> links) {
 		this.links = links;
+	}
+
+	public Map<String,Object> getMetadata() {
+		return metadata;
+	}
+
+	public void setMetadata(Map<String,Object> metadata) {
+		this.metadata = metadata;
 	}
 
 	public void addTag(String tag) {
