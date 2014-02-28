@@ -2,16 +2,18 @@ package edu.carleton.comp4601.assignment2.crawler;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
+import org.apache.lucene.search.ScoreDoc;
+import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
 import org.apache.tika.metadata.HttpHeaders;
@@ -19,36 +21,26 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
-import org.apache.tika.sax.ToHTMLContentHandler;
+import org.apache.tika.sax.BodyContentHandler;
 import org.jgrapht.DirectedGraph;
-import org.jgrapht.Graph;
-import org.jgrapht.UndirectedGraph;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
 import org.jsoup.Jsoup;
-//import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.xml.sax.SAXException;
 
 import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
 
 import edu.uci.ics.crawler4j.crawler.Page;
 import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
-import Jama.Matrix;
-
-
 import edu.carleton.comp4601.assignment2.dao.Document;
-import edu.carleton.comp4601.assignment2.dao.DocumentCollection;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
 import edu.carleton.comp4601.assignment2.persistence.GraphManager;
 import edu.carleton.comp4601.assignment2.persistence.LuceneManager;
-import edu.carleton.comp4601.assignment2.utility.Marshaller;
 
 public class CustomWebCrawler extends WebCrawler {
 
@@ -60,10 +52,11 @@ public class CustomWebCrawler extends WebCrawler {
     private final static Pattern FILTERS_TIKA = Pattern.compile(".*(\\.(jpeg|tiff|gif|png|pdf|doc|docx|xls|xlsx|ppt|pptx))$");
 	private DirectedGraph<Integer, DefaultEdge> g;
 	public static long MIN_POLITNESS_TIME_IN_MS = 200;
-	public static long MAX_POLITNESS_TIME_IN_MS = 150000; // 2.5 min
-	public static long MAX_TIME_TO_WAIT_IN_SEC = 60; // 1 min
+	public static long MAX_POLITNESS_TIME_IN_MS = 75000; // 1.25 min
+	public static long MAX_TIME_TO_WAIT_IN_SEC = 30; // 1 min
 	private Map<String, Duration > durationsToVisitDomains;
 
+	
 	/**
 	 * Before starting crawling, the onStart() method is called.
 	 * You may initialize some local variables if you like. 
@@ -91,7 +84,12 @@ public class CustomWebCrawler extends WebCrawler {
      */
     @Override
     protected void handlePageStatusCode(WebURL webUrl, int statusCode, String statusDescription) {
-    	startingVisit(webUrl.getURL());
+    	String url = webUrl.getURL();
+    	startingVisit(url);
+//    	int max = myController.getConfig().getMaxPagesToFetch();
+//    	if(max>0)
+//    		myController.getConfig().setMaxPagesToFetch(max-1);
+
     }
 
     
@@ -109,8 +107,9 @@ public class CustomWebCrawler extends WebCrawler {
 						|| href.startsWith("http://sikaman.dyndns.org:8888/courses/") || href
 							.startsWith("http://people.scs.carleton.ca/~jeanpier/"))) {
 			if (FILTERS_TIKA.matcher(href).matches()) {
-      			parseDoc(url);
+	  			parseDoc(url);
 			}
+
 			return true;
 		}
 		return false;
@@ -120,154 +119,180 @@ public class CustomWebCrawler extends WebCrawler {
      * This function is called when a page is fetched and ready 
      * to be processed by your program.
      */
-    @Override
-    public void visit(Page page) {          
-            String url = page.getWebURL().getURL();
-            System.out.println("Crawling " + url);
-    		
-            if (page.getParseData() instanceof HtmlParseData) {
-                    HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
-                    
-                    
-                    String html = htmlParseData.getHtml();
+	@Override
+	public void visit(Page page) {
+		String url = page.getWebURL().getURL();
+		String visited_url = page.getWebURL().getURL();
+		Integer docid = new Integer(page.getWebURL().getDocid());
+		String parent_url = page.getWebURL().getParentUrl();
+		String page_type = page.getContentType();
+		BasicDBObject doc = null;
+		System.out.println("URL: " + url + "\n(Page-Type:" + page_type + ")");
 
-                    int docID = page.getWebURL().getDocid();
-                    int parentDocID = page.getWebURL().getParentDocid();
+		if (page.getParseData() instanceof HtmlParseData) {
+			HtmlParseData htmlParseData = (HtmlParseData) page.getParseData();
+			String html = htmlParseData.getHtml();
+			org.jsoup.nodes.Document jsoup_doc = Jsoup.parse(html);
 
-                    org.jsoup.nodes.Document jDoc	=	Jsoup.parse(html.toString());
-            		String title = jDoc.select("title").first().text();
-            		Elements textE = jDoc.select("p");
-            		Elements linksE = jDoc.select("a");
-            		String text = jDoc.select("body").first().text();
-            		
-            		ArrayList<String> tags = new ArrayList<String>();
-            		ArrayList<String> links = new ArrayList<String>();
-            		for(Element t : textE){
-            			tags.add(t.text());
-            		}
+			// ----- MongoDB -----
+			Elements jsoup_links = jsoup_doc.getElementsByTag("a");
+			Elements paragraphs = jsoup_doc.getElementsByTag("p");
+			Elements hTags = jsoup_doc.select("h1, h2, h3, h4");
+			Elements jsoup_text = new Elements(paragraphs);
+			jsoup_text.addAll(hTags);
 
-            		for(Element l : linksE){
-            			links.add(l.text());
-            		}
-            		System.out.println("Title:" +  title);
-            		System.out.println("Text Size:" +  text.length());
-            		System.out.println("Link Size" +  links.size());
-            		System.out.println("Tags Size:" +  tags.size());
-        	        System.out.println("docid:" + page.getWebURL().getDocid());
-            		
-            		
-            		
-            		Document d = new Document(page.getWebURL().getDocid());
-            		d.setLinks(links);
-            		d.setName(title);
-            		d.setTags(tags);
-            		d.setText(text);
+			// Add page to db
+			doc = new BasicDBObject();
+			doc.append("id", docid);
+			doc.append("url", visited_url);
+			doc.append("parent_url", parent_url);
+			doc.append("date", new Date());
+			// text
+			StringBuilder text_builder = new StringBuilder();
+			for (Element e : jsoup_text) {
+				text_builder.append(e.text() + "\n");
+			}
+			// System.out.println("jsoup_text size:"+jsoup_text.size());
+			doc.append("text", text_builder.toString());
+			// images
+			String image_selector = "img[src~=(?i)\\.(png|jpe?g|gif)]";
+			// Elements jsoup_images = jsoup_doc.getElementsByTag("img");
+			Elements jsoup_images = jsoup_doc.select(image_selector);
+			List<String> images = new ArrayList<>();
+			List<String> tags = new ArrayList<>();
+			for (Element e : jsoup_images) {
+				String src = e.attr("src");
+				String alt = e.attr("alt");
+				images.add(src);
+				tags.add(alt);
+				// System.out.println("image:"+e.toString());
+				// System.out.println("	> src:"+src);
+				// System.out.println("	> alt:"+alt);
 
-            		boolean created = DocumentsManager.getDefault().create(d);
-            		
-            		if(created)
-            			System.out.println("Document added to the db successfully");
-            		else
-            			System.out.println("There was an error creating the document");
+			}
+			// System.out.println("jsoup_images size:" + jsoup_images.size()
+			// + ", images size:" + images.size());
+			doc.append("images", images);
+			doc.append("tags", tags);
+			// links
+			List<String> links = new ArrayList<>();
+			for (Element e : jsoup_links) {
+				// System.out.println("link:"+e.toString());
+				String link = e.attr("abs:href");
 
+				if (link != null && !link.isEmpty()) {
+					links.add(link);
+					if (FILTERS_TIKA.matcher(link).matches()) {
+						System.out.println("File URL:" + link);
+						WebURL web_url = new WebURL();
+						web_url.setURL(link);
+						web_url.setParentDocid(docid.intValue());
+						web_url.setDepth((short) (page.getWebURL().getDepth()));
+						visit(new Page(web_url));
+						// tikaParsing(link);
+					}
+				}
+			}
+			// System.out.println("jsoup_links size:" + jsoup_links.size()
+			// + ", links size:" + links.size());
+			doc.append("links", links);
 
-            		
-            		
-            		boolean graphed = graph(docID, parentDocID);
-
-            		if(graphed)
-            			System.out.println("Just graphed too.");
-            		else
-            			System.out.println("There was an error graphing the document");
-
-//            		boolean indexed = LuceneManager.getDefault().indexDocument(url, page.getWebURL().getDocid(), new Date(), text, "text/html");
-//
-//            		if(indexed)
-//            			System.out.println("Document indexed to the lucene successfully");
-//            		else
-//            			System.out.println("There was an error indexing the document");
-            		
-            		endingVisit(url);
-
-            		// ... to be implemented
-            		System.out.println("_____________=========-------==========-------========__________");	
 		} 
 
-    }
+		DocumentsManager.getDefault().add(doc);
+
+		boolean graphed = graph(docid, page.getWebURL().getParentDocid());
+
+		if (graphed)
+			System.out.println("Just graphed too.");
+		else
+			System.out.println("There was an error graphing the document");
+
+		endingVisit(url);
+
+		// ... to be implemented
+		System.out
+				.println("_____________=========-------==========-------========__________");
+	}
     
     public void parseDoc(WebURL weburl){
-		URL url;
-		InputStream input;
-		String url_string = weburl.getURL();
+		System.out.println("Inside the ELSE");
+		String url = weburl.getURL();
+		String visited_url = weburl.getURL();
+		Integer docid = new Integer(weburl.getDocid());
+		String parent_url = weburl.getParentUrl();
+
+		BasicDBObject doc = new BasicDBObject();
+		docid = myController.getDocIdServer().getNewDocID(url);
+		doc.append("id", docid);
+		doc.append("url", visited_url);
+		doc.append("parent_url", parent_url);
+		doc.append("date", new Date());
+
+		 Tika tika = new Tika();
+		java.io.InputStream input = null;
 		try {
-			url = new URL(url_string);
-			input = TikaInputStream.get(url);
-
-			Integer docid = myController.getDocIdServer().getNewDocID(url_string);
-            int parentDocID = weburl.getParentDocid();
-
-	        ToHTMLContentHandler toHTMLHandler = new ToHTMLContentHandler();
-	        
-			Metadata	metadata	=	new	Metadata();	
-			ParseContext	context	=	new	ParseContext();	
-			Parser parser	=	 new AutoDetectParser();	
-
-			parser.parse(input,	toHTMLHandler,	metadata,	context);
-
-            org.jsoup.nodes.Document jDoc	=	Jsoup.parse(toHTMLHandler.toString());
+			URL net_url = new URL(url);
+			Metadata metadata = new Metadata();
+			input = TikaInputStream.get(net_url, metadata);
+			org.xml.sax.ContentHandler textHandler = new BodyContentHandler(-1);
+			ParseContext context = new ParseContext();
+			Parser parser = new AutoDetectParser();
+			String type = tika.detect(net_url);
 			
-    		String text = metadata.toString() + jDoc.select("body").first().text();
+			System.out.println("MimeType type =" + type.toString());
 
-        	System.out.println("Gonna parse url: " + weburl.getURL());
+			Map<String,Object> mongoDB_metadata = new HashMap<String, Object>();
+			
+			parser.parse(input, textHandler, metadata, context); // parse the stream
+		    for (int i = 0; i < metadata.names().length; i++) {
+		        String item = metadata.names()[i];
+		        System.out.println(" > "+item + " -- " + metadata.get(item));
+		        if(metadata.isMultiValued(item))
+		        	mongoDB_metadata.put(item, metadata.getValues(item));
+		        else
+		        	mongoDB_metadata.put(item, metadata.get(item));
+		        	
+		    }
+
+		    doc.append("metadata", mongoDB_metadata);
+		    doc.append("text", textHandler.toString());
+		    
+        	System.out.println("Gonna parse url: " + url);
         	
 	        System.out.println("Type:" + metadata.get(HttpHeaders.CONTENT_TYPE));
 	        System.out.println("Title:" + metadata.get("title"));
 	       // System.out.println("Text:" + text);
-	        System.out.println("docid:" + docid);
+	        System.out.println("docid:" + doc.get("id"));
 	        System.out.println("Metadata:" + metadata.toString());
-	        
-	        String title = "";
-	        if(metadata.get("title") != null)
-	        	title = metadata.get("title");
-        	else
-        		title = weburl.getURL();
+			
+	        DocumentsManager.getDefault().add(doc);
 
-    		Document d = new Document(docid);
-    		d.setName(title);
-    		d.setText(text);
-    		
-    		
-    		boolean created = DocumentsManager.getDefault().create(d);
+			boolean graphed = graph(docid, weburl.getParentDocid());
 
-    		
-    		if(created)
-    			System.out.println("Document added to the db successfully");
-    		else
-    			System.out.println("There was an error creating the document");
-    		
-    		boolean graphed = graph(docid.intValue(), parentDocID);
-    		if(graphed)
-    			System.out.println("Just graphed too.");
-    		else
-    			System.out.println("There was an error graphing the document");
-    		
-//    		boolean indexed = LuceneManager.getDefault().indexDocument(weburl.getURL(), weburl.getDocid(), new Date(), text, metadata.toString());
-//
-//    		if(indexed)
-//    			System.out.println("Document indexed to the lucene successfully");
-//    		else
-//    			System.out.println("There was an error indexing the document");
+			if (graphed)
+				System.out.println("Just graphed too.");
+			else
+				System.out.println("There was an error graphing the document");
 
-    		
-    		
-		}
-		catch (IOException | SAXException | TikaException e) {
+			endingVisit(url);
+
+			// ... to be implemented
+			System.out
+					.println("_____________=========-------==========-------========__________");
+
+		    
+		} catch (IOException | org.xml.sax.SAXException | TikaException e) {
+			// TODO Auto-generated catch block
 			e.printStackTrace();
+		} finally {
+			try {
+				input.close();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} // close the stream
 		}
-		
-    	endingVisit(url_string);
-		System.out.println("_____________=========-------==========-------========__________");
-        
     }
 
     public void calculatePageRank(){
@@ -323,10 +348,12 @@ public class CustomWebCrawler extends WebCrawler {
     }
     
     
-    public static void searchFor(String query){
-    	LuceneManager.getDefault().query(query);
-    }
-    
+//    public static void searchFor(String query){
+//    	List<Document> result = LuceneManager.getDefault().query(query, 10);
+//	    System.out.println("Searchfor : "+query + " size="+result.size()+" "+result.toString());
+//    }
+
+	
     protected void startingVisit(String url){
     	if(myController.getDocIdServer().isSeenBefore(url)){
 //        	System.out.println("MyCrawler - "+url);

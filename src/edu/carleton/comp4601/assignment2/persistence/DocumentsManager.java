@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-
 import com.mongodb.DBObject;
 
 import com.mongodb.BasicDBObject;
@@ -20,8 +19,8 @@ public class DocumentsManager extends AbstractMongoDBManager {
 
 	private static DocumentsManager manager;
 	private static String DEFAULT_DB = "sda";
-	private static String DEFAULT_COLLECTION = "index";
-	
+	private static String DEFAULT_COLLECTION = "documents";
+
 	
 	/**
 	 * Shorten constructor for DocumentsManager where host and port will be substituted by
@@ -131,14 +130,14 @@ public class DocumentsManager extends AbstractMongoDBManager {
 		DBCursor cursor = collection.find(query);
 		if (cursor.count() > 0){
 			BasicDBObject obj = (BasicDBObject) cursor.next();
-			Document doc = new Document(obj.toMap());
-			return doc;
+			return Document.getDocumentFrom(obj);
 		}
 		else{
 			return null;
 		}
 
 	}
+	
 	public boolean updateScore(int id, int score){
 		BasicDBObject query = new BasicDBObject("id",id);
 		return DocumentsManager.getDefault().update("score", score, query);
@@ -148,19 +147,21 @@ public class DocumentsManager extends AbstractMongoDBManager {
 		return this.add(a).getLastError().ok();
 	}
 	
+	
 	public synchronized WriteResult add(Document a){
 
-		BasicDBObject doc = new BasicDBObject("id", a.getId());
-		doc.put("name", a.getName());
-		doc.put("text", a.getText());
-		doc.put("tags", a.getTags());
-		doc.put("links", a.getLinks());
-		doc.put("score", 0);
+		BasicDBObject obj = Document.getBasicDBObjectFromDocument(a);
 		
 		if(collection != null){
-			return collection.insert(doc, WriteConcern.SAFE);
+			return collection.insert(obj, WriteConcern.SAFE);
 		}
 		else
 			return null;
 	}
+	
+    
+	public DBCursor getCollectionCursor(){
+		return collection.find();
+	}
+	
 }

@@ -2,6 +2,8 @@ package edu.carleton.comp4601.assignment2.crawler;
 
 import org.apache.log4j.PropertyConfigurator;
 
+import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
+import edu.carleton.comp4601.assignment2.persistence.LuceneManager;
 import edu.uci.ics.crawler4j.crawler.CrawlConfig;
 import edu.uci.ics.crawler4j.crawler.CrawlController;
 import edu.uci.ics.crawler4j.fetcher.PageFetcher;
@@ -9,9 +11,9 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtConfig;
 import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 public class Controller {
-//	public static String CRAWL_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp";
+	public static String CRAWL_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp";
 //	public static String CRAWL_DIR = "/Volumes/My Passport/School/workspace/data/crawler/root";
-	public static String CRAWL_DIR = "/Users/dynasty/Documents/workspace/data/crawler/root";
+//	public static String CRAWL_DIR = "/Users/dynasty/Documents/workspace/data/crawler/root";
 
 	public static void main(String[] args) throws Exception {
 		int numberOfCrawlers = 3;
@@ -48,9 +50,9 @@ public class Controller {
 		/*
 		 * Connection timeout in milliseconds
 		 */
-		config1.setConnectionTimeout(60000); // 1 Minute
-		config2.setConnectionTimeout(60000); // 1 Minute
-		config3.setConnectionTimeout(60000); // 1 Minute
+		config1.setConnectionTimeout(30000); // 1 Minute
+		config2.setConnectionTimeout(30000); // 1 Minute
+		config3.setConnectionTimeout(30000); // 1 Minute
 
 		/*
 		 * This config parameter can be used to set your crawl to be resumable
@@ -109,6 +111,14 @@ public class Controller {
 		controller3.addSeed("http://people.scs.carleton.ca/~jeanpier/");
 
 		/*
+		 * Setup the databases
+		 */
+		DocumentsManager.getDefault().setupTable();
+		LuceneManager.getDefault().setupTable();
+		
+		
+		
+		/*
 		 * Each crawler will have numberOfCrawlers of threads
 		 */
 		controller1.startNonBlocking(CustomWebCrawler.class, numberOfCrawlers);
@@ -124,9 +134,6 @@ public class Controller {
 		controller3.waitUntilFinish();
 		System.out.println("Crawler 3 is finished.");
 		
-
-		
-		CustomWebCrawler.searchFor("3004");
 
 	}
 }
