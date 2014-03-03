@@ -109,10 +109,6 @@ public class DocumentsManager extends AbstractMongoDBManager {
 		
 		return save(a);
 	}
-	
-	public boolean create(Document d) {
-		return save(d);
-	}
 
 	
 	public boolean remove(Document doc) {
@@ -149,7 +145,7 @@ public class DocumentsManager extends AbstractMongoDBManager {
 	
 	
 	public synchronized WriteResult add(Document a){
-
+		
 		BasicDBObject obj = Document.getBasicDBObjectFromDocument(a);
 		
 		if(collection != null){

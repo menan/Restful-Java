@@ -195,23 +195,33 @@ public class Document extends BasicDBObject{
 	
 	public static BasicDBObject getBasicDBObjectFromDocument(Document doc){
 		BasicDBObject obj = new BasicDBObject("id", doc.getId());
-		doc.put("name", doc.getName());
-		doc.put("text", doc.getText());
-		doc.put("tags", doc.getTags());
-		doc.put("links", doc.getLinks());
-		doc.put("date", doc.getCrawledDate());
-		doc.put("score", doc.getScore());
-		doc.put("metadata", doc.getMetadata());
-		doc.put("url", doc.getUrl());
-		doc.put("parent_url", doc.getParent_url());
+		obj.put("name", doc.getName());
+		obj.put("url", doc.getUrl());
+		obj.put("text", doc.getText());
+		obj.put("tags", doc.getTags());
+		obj.put("links", doc.getLinks());
+		obj.put("date", doc.getCrawledDate());
+		obj.put("score", doc.getScore());
+		obj.put("metadata", doc.getMetadata());
+		obj.put("parent_url", doc.getParent_url());
+		
+//		System.out.println("getBasicDBObjectFromDocument Testing Resutl Before Returning it");
+//		System.out.println("Passed Doc: "+doc.toString());		
+//		for(String k : obj.keySet()){
+//			System.out.println("	> "+k+" : "+obj.get(k));
+//		}
+//
 		return obj;
 	}
 
 	public static org.apache.lucene.document.Document getLuceneDocFromDocument(Document doc) throws UnsupportedEncodingException{
 		org.apache.lucene.document.Document lucene_doc = new org.apache.lucene.document.Document();
-		lucene_doc.add(new StringField(URL, doc.getUrl(), Field.Store.YES));
-		lucene_doc.add(new IntField(DOC_ID, doc.getId(), Field.Store.YES));
-		lucene_doc.add(new LongField(DATE, doc.getCrawledDate().getTime(), Field.Store.NO));
+		if(doc.getUrl() != null)
+			lucene_doc.add(new StringField(URL, doc.getUrl(), Field.Store.YES));
+		if(doc.getId() != null)
+			lucene_doc.add(new IntField(DOC_ID, doc.getId(), Field.Store.YES));
+		if(doc.getCrawledDate() != null)
+			lucene_doc.add(new LongField(DATE, doc.getCrawledDate().getTime(), Field.Store.NO));
 		String content = doc.getImages() != null ? doc.getText()+ "\n"+ doc.getTags().toString() : doc.getText();
 //		lucene_doc.add(new TextField(CONTENT, content, Field.Store.YES));
 		lucene_doc.add(new	TextField(CONTENT,	
@@ -219,6 +229,10 @@ public class Document extends BasicDBObject{
 		if(doc.getMetadata() != null)
 			lucene_doc.add(new TextField(METADATA, doc.getMetadata().toString(), Field.Store.NO));
 		return lucene_doc;
+	}
+	
+	public String toString(){
+		return new String ("ID:"+getId()+", Name:"+name+", URL:"+getUrl()+", Date:"+getCrawledDate());
 	}
 
 	

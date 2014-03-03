@@ -55,7 +55,8 @@ public class CustomWebCrawler extends WebCrawler {
 	public static long MAX_POLITNESS_TIME_IN_MS = 75000; // 1.25 min
 	public static long MAX_TIME_TO_WAIT_IN_SEC = 30; // 1 min
 	private Map<String, Duration > durationsToVisitDomains;
-
+	private static int CRAWLER_ID = 1;
+	private int crawler_id;
 	
 	/**
 	 * Before starting crawling, the onStart() method is called.
@@ -63,6 +64,7 @@ public class CustomWebCrawler extends WebCrawler {
 	 */
 	@Override
 	public void onStart() {
+		crawler_id = CRAWLER_ID++;
 		durationsToVisitDomains = new ConcurrentHashMap< String, Duration >();
 		g = new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
 	}
@@ -101,18 +103,12 @@ public class CustomWebCrawler extends WebCrawler {
     @Override
     public boolean shouldVisit(WebURL url) {
         String href = url.getURL().toLowerCase();
-//        System.out.println("Not sure if I should visit " + href);
-		if (!FILTERS.matcher(href).matches()
+        boolean answer = !FILTERS.matcher(href).matches()
 				&& (href.contains("carleton.ca/")
 						|| href.startsWith("http://sikaman.dyndns.org:8888/courses/") || href
-							.startsWith("http://people.scs.carleton.ca/~jeanpier/"))) {
-			if (FILTERS_TIKA.matcher(href).matches()) {
-	  			parseDoc(url);
-			}
-
-			return true;
-		}
-		return false;
+							.startsWith("http://people.scs.carleton.ca/~jeanpier/"));
+//        System.out.println("Should visit: " + href+" ("+answer+")");
+		return answer;
     }
 
     /**
@@ -182,22 +178,26 @@ public class CustomWebCrawler extends WebCrawler {
 
 				if (link != null && !link.isEmpty()) {
 					links.add(link);
-					if (FILTERS_TIKA.matcher(link).matches()) {
-						System.out.println("File URL:" + link);
-						WebURL web_url = new WebURL();
-						web_url.setURL(link);
-						web_url.setParentDocid(docid.intValue());
-						web_url.setDepth((short) (page.getWebURL().getDepth()));
-						visit(new Page(web_url));
-						// tikaParsing(link);
-					}
 				}
 			}
 			// System.out.println("jsoup_links size:" + jsoup_links.size()
 			// + ", links size:" + links.size());
 			doc.append("links", links);
 
-		} 
+		}
+		else if (FILTERS_TIKA.matcher(url).matches()) {
+			// Add page to db
+			doc = new BasicDBObject();
+			docid = myController.getDocIdServer().getNewDocID(url);
+			doc.append("id", docid);
+			doc.append("url", visited_url);
+			doc.append("parent_url", parent_url);
+			doc.append("date", new Date());
+			System.out.println("Inside the ELSE and the assigned docid = "+docid +" (URL:"+url+" | PARENT_URL:+"+parent_url+")");
+
+  			parseDoc(url, doc);
+		}
+
 
 		DocumentsManager.getDefault().add(doc);
 
@@ -215,21 +215,9 @@ public class CustomWebCrawler extends WebCrawler {
 				.println("_____________=========-------==========-------========__________");
 	}
     
-    public void parseDoc(WebURL weburl){
-		System.out.println("Inside the ELSE");
-		String url = weburl.getURL();
-		String visited_url = weburl.getURL();
-		Integer docid = new Integer(weburl.getDocid());
-		String parent_url = weburl.getParentUrl();
+    public void parseDoc(String url, BasicDBObject doc){
 
-		BasicDBObject doc = new BasicDBObject();
-		docid = myController.getDocIdServer().getNewDocID(url);
-		doc.append("id", docid);
-		doc.append("url", visited_url);
-		doc.append("parent_url", parent_url);
-		doc.append("date", new Date());
-
-		 Tika tika = new Tika();
+    	Tika tika = new Tika();
 		java.io.InputStream input = null;
 		try {
 			URL net_url = new URL(url);
@@ -265,22 +253,6 @@ public class CustomWebCrawler extends WebCrawler {
 	       // System.out.println("Text:" + text);
 	        System.out.println("docid:" + doc.get("id"));
 	        System.out.println("Metadata:" + metadata.toString());
-			
-	        DocumentsManager.getDefault().add(doc);
-
-			boolean graphed = graph(docid, weburl.getParentDocid());
-
-			if (graphed)
-				System.out.println("Just graphed too.");
-			else
-				System.out.println("There was an error graphing the document");
-
-			endingVisit(url);
-
-			// ... to be implemented
-			System.out
-					.println("_____________=========-------==========-------========__________");
-
 		    
 		} catch (IOException | org.xml.sax.SAXException | TikaException e) {
 			// TODO Auto-generated catch block
@@ -312,7 +284,7 @@ public class CustomWebCrawler extends WebCrawler {
     }
     
     public boolean storeGraph(){
-    	GraphManager.getDefault().save(g);
+    	GraphManager.getDefault().save(g, crawler_id);
 		System.out.println("The finished version of the graph:");
 		System.out.println(g);
     	return true;

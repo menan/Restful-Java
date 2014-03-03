@@ -77,16 +77,21 @@ public class GraphManager extends AbstractMongoDBManager{
 	}
 	
 
-	@SuppressWarnings("unchecked")
 	public DirectedGraph<Integer, DefaultEdge> loadGraph(){
+		return loadGraph(0);
+	}
+	
+	@SuppressWarnings("unchecked")
+	public DirectedGraph<Integer, DefaultEdge> loadGraph(int graph_id){
 		try {
-			return (DirectedGraph<Integer, DefaultEdge>) Marshaller.deserializeObject(load());
+			return (DirectedGraph<Integer, DefaultEdge>) Marshaller.deserializeObject(load(graph_id));
 		} catch (IOException e) {
 			e.printStackTrace();
 			return null;
 		}
 	}
 
+	
 	
 	public byte[] load(){
 		BasicDBObject query = new BasicDBObject("id", 0);
@@ -102,17 +107,42 @@ public class GraphManager extends AbstractMongoDBManager{
 
 	}
 
+	public byte[] load(int crawler_id){
+		BasicDBObject query = new BasicDBObject("id", crawler_id);
+		DBCursor cursor = collection.find(query);
+		if (cursor.count() > 0){
+			BasicDBObject obj = (BasicDBObject) cursor.next();
+			byte[] data = (byte[]) obj.get("data");
+			return data;
+		}
+		else{
+			return null;
+		}
+
+	}
+
+	
 	public boolean save(BasicDBObject a){
 		return this.add(a).getLastError().ok();
 	}
 
 	public boolean save(byte[] data) {
-		BasicDBObject graph = new BasicDBObject("id", 0);
+		return save(data, 0);
+	}
+	
+	public boolean save(byte[] data, int crawler_id) {
+		BasicDBObject graph = new BasicDBObject("id", crawler_id);
 		graph.put("data", data);
 		return save(graph);
 	}
+
+	
 	public boolean save(DirectedGraph<Integer, DefaultEdge> graph) {
-		BasicDBObject obj = new BasicDBObject("id", 0);
+		return save(graph, 0);
+	}
+	
+	public boolean save(DirectedGraph<Integer, DefaultEdge> graph, int crawler_id) {
+		BasicDBObject obj = new BasicDBObject("id", crawler_id);
 		try {
 			obj.put("data", Marshaller.serializeObject(graph));
 		} catch (IOException e) {
@@ -120,4 +150,5 @@ public class GraphManager extends AbstractMongoDBManager{
 		}
 		return save(obj);
 	}
+
 }

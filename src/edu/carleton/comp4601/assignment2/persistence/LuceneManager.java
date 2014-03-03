@@ -24,22 +24,18 @@ import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 
 
-public class LuceneManager extends AbstractMongoDBManager {
+public class LuceneManager {
 
 	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
-	
-	private static String DEFAULT_DB = "sda";
-	private static String DEFAULT_COLLECTION = "index";
 
 	int hitsPerPage = 10;
 	
 
 	private FSDirectory dir;
 	private StandardAnalyzer analyzer;
-	private IndexWriterConfig iwc;
 	private IndexWriter writer;
 	private static LuceneManager manager;
-
+	private String indixing_dir;
 	
 	/**
 	 * Shorten constructor for LuceneManager where host and port will be substituted by
@@ -53,20 +49,17 @@ public class LuceneManager extends AbstractMongoDBManager {
 	 * @param objectClass
 	 * @return
 	 */
-	private LuceneManager(String db_name, String collection_name, @SuppressWarnings("rawtypes") Class objectClass) {
-		super(db_name, collection_name, objectClass);
-		initLucene();
+	private LuceneManager() {
+		initLucene(INDEX_DIR);
 	}
 	
-	private LuceneManager(String host, int port, String db_name,
-			String collection_name, @SuppressWarnings("rawtypes") Class objectClass) {
-		super(host, port, db_name, collection_name, objectClass);
-		initLucene();
+	private LuceneManager(String indixing_dir) {
+		initLucene(indixing_dir);
 	}
 	
-	private void initLucene(){
+	private void initLucene(String indixing_dir){
+		this.indixing_dir = indixing_dir;
 		analyzer = new StandardAnalyzer(Version.LUCENE_46);
-		iwc = new IndexWriterConfig(Version.LUCENE_46, analyzer);
 	}
 	
 	
@@ -78,40 +71,18 @@ public class LuceneManager extends AbstractMongoDBManager {
 	public static LuceneManager getDefault() {
 		
 		if (manager == null) {
-			manager = new LuceneManager(DEFAULT_DB, DEFAULT_COLLECTION, null);
+			manager = new LuceneManager();
 		}
 		return manager;
-	}
-	
-	@Override
-	public boolean setupTable() {
-		if(collection != null && this.drop()){
-			collection = db.getCollection(this.collection_name);
-			return (collection != null);
-		}
-		return false;
-	}
-
-	@Override
-	public String getClassName() {
-		if(objecClass == null)
-			return "";
-		return this.objecClass.getSimpleName();
-	}
-
-	@Override
-	public String getCollectionName() {
-		if(collection == null)
-			return "";
-		return collection.getName();
 	}
 	
 	public synchronized void index() {
 		IndexWriter writer = null;
 		FSDirectory dir = null;
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_46, analyzer);
 
 		try {
-			dir = FSDirectory.open(new File(INDEX_DIR));
+			dir = FSDirectory.open(new File(this.indixing_dir));
 			writer = new IndexWriter(dir, iwc);
 			indexDocuments(writer);
 		} catch (IOException e) {
@@ -139,34 +110,17 @@ public class LuceneManager extends AbstractMongoDBManager {
 			BasicDBObject obj = (BasicDBObject) cursor.next();
 			edu.carleton.comp4601.assignment2.dao.Document doc = edu.carleton.comp4601.assignment2.dao.Document.getDocumentFrom(obj);
 	    	System.out.println("trying to index:" + doc.getUrl());
-	    	Document luceneDoc = edu.carleton.comp4601.assignment2.dao.Document.getLuceneDocFromDocument(doc);
-			writer.addDocument(luceneDoc);
+	    	if(doc != null){
+		    	Document luceneDoc = edu.carleton.comp4601.assignment2.dao.Document.getLuceneDocFromDocument(doc);
+				writer.addDocument(luceneDoc);
+	    	}
 		}
 	}
-    
-    
-//	public ArrayList<edu.carleton.comp4601.assignment2.dao.Document> query(String searchString) {
-//		try {
-//			IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(INDEX_DIR)));
-//			IndexSearcher searcher = new IndexSearcher(reader);
-//			QueryParser parser = new QueryParser(Version.LUCENE_46, edu.carleton.comp4601.assignment2.dao.Document.CONTENT, analyzer);
-//			Query q = parser.parse(searchString);
-//			TopDocs results = searcher.search(q, 10);
-//			ScoreDoc[] hits = results.scoreDocs;
-//			reader.close();
-//			return getDocs(hits);
-//		}
-//		catch (IOException | ParseException e)
-//		{
-//			e.printStackTrace();
-//		}
-//		return
-//				null;
-//	}
+
 	
 	public ArrayList<edu.carleton.comp4601.assignment2.dao.Document> query(String searchString, int n) {
 		try {
-			IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(INDEX_DIR)));
+			IndexReader reader = DirectoryReader.open(FSDirectory.open(new File(this.indixing_dir)));
 			IndexSearcher searcher = new IndexSearcher(reader);
 			QueryParser parser = new QueryParser(Version.LUCENE_46, edu.carleton.comp4601.assignment2.dao.Document.CONTENT, analyzer);
 			Query q = parser.parse(searchString);
@@ -191,7 +145,7 @@ public class LuceneManager extends AbstractMongoDBManager {
 		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> docs = 
 				new ArrayList<edu.carleton.comp4601.assignment2.dao.Document>();
 		
-		dir = FSDirectory.open(new File (INDEX_DIR));
+		dir = FSDirectory.open(new File (this.indixing_dir));
     	IndexReader reader = DirectoryReader.open(dir);
     	IndexSearcher searcher = new IndexSearcher(reader);
 		for (ScoreDoc hit :hits){
@@ -205,52 +159,13 @@ public class LuceneManager extends AbstractMongoDBManager {
 		}
 		return docs;
 	}
+
 	
-
-
-
-//    public boolean addDocument(Document d) {
-//		try {
-//			System.out.println("adding document to index:" + d.get(DOC_ID));
-//	    	writer.addDocument(d);
-//	    	writer.close();
-//	    	return true;
-//		} catch (IOException e) {
-//			System.out.println("Error adding document to index:" + d.get(DOC_ID));
-//			e.printStackTrace();
-//			return false;
-//		}
-//	}
-//
-//    
-//    public ScoreDoc[] search(String query, int thisHitsPerPage){
-//    	Directory dir;
-//		try {
-//			dir = FSDirectory.open(new File(INDEX_DIR));
-//	    	QueryParser parser = new QueryParser(Version.LUCENE_46, CONTENT, analyzer);
-//	    	Query q = parser.parse(query);
-//	    	IndexReader reader = DirectoryReader.open(dir);
-//	    	IndexSearcher searcher = new IndexSearcher(reader);
-//	    	TopDocs results = searcher.search(q, thisHitsPerPage);
-//	    	System.out.println("Searching for: " + query.toString());
-//	    	ScoreDoc[] hits = results.scoreDocs;
-//	    	for(int i = 0; i < hits.length; i++){
-//	    		int docId = hits[i].doc;
-//	    		Document d = searcher.doc(docId);
-//	    		System.out.println(d.get("doc_id"));
-//	    	}
-//			System.out.println(hits.length + " resuts found");
-//			return hits;
-//		} catch (IOException | ParseException e) {
-//			e.printStackTrace();
-//			return null;
-//		}
-//    	 
-//    }
-    
 	public boolean reset() {
+		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_46, analyzer);
+
 		try {
-			dir = FSDirectory.open(new File(INDEX_DIR));
+			dir = FSDirectory.open(new File(this.indixing_dir));
 			writer = new IndexWriter(dir, iwc);
 			writer.deleteAll();
 			return true;
@@ -271,13 +186,27 @@ public class LuceneManager extends AbstractMongoDBManager {
 	}
 
 	public static void main(String[] args) {
+
 		LuceneManager manager = LuceneManager.getDefault();
+		manager.reset();
+
+		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
+		eclipse_doc.setScore(1);
+		eclipse_doc.setUrl("http://someurl.edu");
+		eclipse_doc.setText("Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
+				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
+				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse ");
+		DocumentsManager.getDefault().save(eclipse_doc);
+		List<edu.carleton.comp4601.assignment2.dao.Document> searchedDocs = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", "Eclipse", false));
+		for(edu.carleton.comp4601.assignment2.dao.Document d : searchedDocs){
+			if(d.getId().intValue() == 999999)
+				System.out.println("eclipse_doc was added");
+		}
+
 		
-//		manager.index();
+		manager.index();
 		
-//		manager.reset();
-		
-		String search_query = "3004";
+		String search_query = "Eclipse";
 		int docToLoad = -1;
 		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> results =  manager.query(search_query, 20);
 		System.out.println("Search Lucene for : "+search_query + " size="+results.size());
@@ -301,6 +230,11 @@ public class LuceneManager extends AbstractMongoDBManager {
 		List<edu.carleton.comp4601.assignment2.dao.Document> results2 = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", search_query, false));
 		System.out.println("Search MongoDB [text] for : "+search_query + " size="+results2.size());
 
+		System.out.println("	--- Stored Graphs ---	");
+		for(int i = 1; i < 10; i++){	// I know before hand that there are 9 graphs stored already in the DB
+			System.out.println("Graph ("+i+"):\n	>"+ GraphManager.getDefault().loadGraph(i));
+		}
+		
 	}
     
 }
