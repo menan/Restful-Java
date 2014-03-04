@@ -50,13 +50,17 @@ public class CustomWebCrawler extends WebCrawler {
                                                       + "|wav|avi|mov|mpeg|ram|m4v" 
                                                       + "|rm|smil|wmv|swf|wma|zip|rar|gz))$");
     private final static Pattern FILTERS_TIKA = Pattern.compile(".*(\\.(jpeg|tiff|gif|png|pdf|doc|docx|xls|xlsx|ppt|pptx))$");
-	private DirectedGraph<Integer, DefaultEdge> g;
+	private static DirectedGraph<Integer, DefaultEdge> g;
 	public static long MIN_POLITNESS_TIME_IN_MS = 200;
 	public static long MAX_POLITNESS_TIME_IN_MS = 75000; // 1.25 min
 	public static long MAX_TIME_TO_WAIT_IN_SEC = 30; // 1 min
 	private Map<String, Duration > durationsToVisitDomains;
-	private static int CRAWLER_ID = 1;
+//	private static int CRAWLER_ID = 1;
 	private int crawler_id;
+	
+	public static void setupNewGraph(){
+		g = new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+	}
 	
 	/**
 	 * Before starting crawling, the onStart() method is called.
@@ -64,9 +68,10 @@ public class CustomWebCrawler extends WebCrawler {
 	 */
 	@Override
 	public void onStart() {
-		crawler_id = CRAWLER_ID++;
+//		crawler_id = CRAWLER_ID++;
 		durationsToVisitDomains = new ConcurrentHashMap< String, Duration >();
-		g = new DefaultDirectedGraph<Integer, DefaultEdge>(DefaultEdge.class);
+		if(g==null)
+			setupNewGraph();
 	}
 	
 	/**
@@ -75,7 +80,7 @@ public class CustomWebCrawler extends WebCrawler {
 	 */
     @Override
     public void onBeforeExit(){
-    	storeGraph();
+//    	storeGraph();
     	calculatePageRank();
     }
 	
@@ -283,7 +288,7 @@ public class CustomWebCrawler extends WebCrawler {
 		}
     }
     
-    public boolean storeGraph(){
+    public static boolean storeGraph(int crawler_id){
     	GraphManager.getDefault().save(g, crawler_id);
 		System.out.println("The finished version of the graph:");
 		System.out.println(g);

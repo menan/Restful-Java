@@ -12,11 +12,13 @@ import edu.uci.ics.crawler4j.robotstxt.RobotstxtServer;
 
 public class Controller {
 	public static String CRAWL_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp";
+	public static int DEFAULT_CRAWL_GRAPH_ID = 100;
+
 //	public static String CRAWL_DIR = "/Volumes/My Passport/School/workspace/data/crawler/root";
 //	public static String CRAWL_DIR = "/Users/dynasty/Documents/workspace/data/crawler/root";
 
 	public static void main(String[] args) throws Exception {
-		int numberOfCrawlers = 3;
+		int numberOfCrawlers = 10;
 
 		PropertyConfigurator.configure("log4j.properties");
 		
@@ -91,15 +93,18 @@ public class Controller {
 		 */
 		DocumentsManager.getDefault().setupTable();
 		GraphManager.getDefault().setupTable();
-		
+		CustomWebCrawler.setupNewGraph();
+
 		
 		/*
 		 * Each crawler will have numberOfCrawlers of threads
 		 */
-		controller.startNonBlocking(CustomWebCrawler.class, numberOfCrawlers);
+		controller.start(CustomWebCrawler.class, numberOfCrawlers);
 		
 		controller.waitUntilFinish();
-		System.out.println("Crawler 1 is finished.");
+		System.out.println("Crawler is finished.");
 
+		CustomWebCrawler.storeGraph(DEFAULT_CRAWL_GRAPH_ID);
+		
 	}
 }

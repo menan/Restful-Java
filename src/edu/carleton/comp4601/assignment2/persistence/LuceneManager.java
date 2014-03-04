@@ -23,6 +23,8 @@ import org.apache.lucene.store.FSDirectory;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBCursor;
 
+import edu.carleton.comp4601.assignment2.crawler.Controller;
+
 
 public class LuceneManager {
 
@@ -188,23 +190,23 @@ public class LuceneManager {
 	public static void main(String[] args) {
 
 		LuceneManager manager = LuceneManager.getDefault();
-		manager.reset();
+//		manager.reset();
 
-		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
-		eclipse_doc.setScore(1);
-		eclipse_doc.setUrl("http://someurl.edu");
-		eclipse_doc.setText("Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
-				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
-				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse ");
-		DocumentsManager.getDefault().save(eclipse_doc);
-		List<edu.carleton.comp4601.assignment2.dao.Document> searchedDocs = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", "Eclipse", false));
-		for(edu.carleton.comp4601.assignment2.dao.Document d : searchedDocs){
-			if(d.getId().intValue() == 999999)
-				System.out.println("eclipse_doc was added");
-		}
+//		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
+//		eclipse_doc.setScore(1);
+//		eclipse_doc.setUrl("http://someurl.edu");
+//		eclipse_doc.setText("Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
+//				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
+//				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse ");
+//		DocumentsManager.getDefault().save(eclipse_doc);
+//		List<edu.carleton.comp4601.assignment2.dao.Document> searchedDocs = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", "Eclipse", false));
+//		for(edu.carleton.comp4601.assignment2.dao.Document d : searchedDocs){
+//			if(d.getId().intValue() == 999999)
+//				System.out.println("eclipse_doc was added");
+//		}
 
 		
-		manager.index();
+//		manager.index();
 		
 		String search_query = "Eclipse";
 		int docToLoad = -1;
@@ -231,9 +233,7 @@ public class LuceneManager {
 		System.out.println("Search MongoDB [text] for : "+search_query + " size="+results2.size());
 
 		System.out.println("	--- Stored Graphs ---	");
-		for(int i = 1; i < 10; i++){	// I know before hand that there are 9 graphs stored already in the DB
-			System.out.println("Graph ("+i+"):\n	>"+ GraphManager.getDefault().loadGraph(i));
-		}
+		System.out.println("Graph:"+ GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
 		
 	}
     
