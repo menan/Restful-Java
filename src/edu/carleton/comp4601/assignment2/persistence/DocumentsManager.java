@@ -105,7 +105,7 @@ public class DocumentsManager extends AbstractMongoDBManager {
 		a.setText(text);
 		a.setTags(new ArrayList<String>(Arrays.asList(tags.split(":"))));
 		a.setLinks(new ArrayList<String>(Arrays.asList(links.split(" "))));
-		a.setScore(0);
+		a.setScore(0.0f);
 		
 		return save(a);
 	}
@@ -134,9 +134,9 @@ public class DocumentsManager extends AbstractMongoDBManager {
 
 	}
 	
-	public boolean updateScore(int id, int score){
+	public boolean updateScore(int id, double d){
 		BasicDBObject query = new BasicDBObject("id",id);
-		return DocumentsManager.getDefault().update("score", score, query);
+		return DocumentsManager.getDefault().update("score", d, query);
 	}
 
 	public boolean save(Document a){
