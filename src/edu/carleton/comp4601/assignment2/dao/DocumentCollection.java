@@ -24,7 +24,8 @@ public class DocumentCollection {
 	
 	public DocumentCollection(){
 		DocumentsManager manager = DocumentsManager.getDefault();
-		setDocuments(DocumentsManager.convertDBObject(manager.findAll("id")));
+		documents = DocumentsManager.convertDBObject(manager.findAll("id"));
+		setDocuments(documents);
 	}
 	
 	/**

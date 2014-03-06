@@ -84,6 +84,7 @@ public class DocumentsManager extends AbstractMongoDBManager {
 	public static List<Document> convertDBObject(List<DBObject> list){
 		List<Document> docs = new ArrayList<Document>(); 
 		for(DBObject obj: list){
+			System.out.println("obj: " + obj.toString());
 			docs.add(new Document(obj.toMap()));
 		}
 		return docs;

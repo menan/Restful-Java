@@ -56,9 +56,6 @@
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/jsp-api.jar"/>
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/jsr311-api-1.1.1.jar"/>
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/log4j-1.2.14.jar"/>
-	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/lucene-analyzers-common-4.6.1.jar"/>
-	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/lucene-core-4.6.1.jar"/>
-	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/lucene-queryparser-4.6.1.jar"/>
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/metadata-extractor-2.4.0-beta-1.jar"/>
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/mongo-java-driver-2.11.3.jar"/>
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/servlet-api.jar"/>
@@ -74,5 +71,8 @@
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/tomcat-util.jar"/>
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/tomcat7-websocket.jar"/>
 	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/websocket-api.jar"/>
+	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/lucene-analyzers-common-4.6.1.jar"/>
+	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/lucene-core-4.6.1.jar"/>
+	<classpathentry kind="lib" path="/Users/menan/Projects/eclipse-workspace/COMP4601A2/lib/lucene-queryparser-4.6.1.jar"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>
