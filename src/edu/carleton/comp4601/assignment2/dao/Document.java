@@ -34,7 +34,7 @@ public class Document extends BasicDBObject{
 	 */
 	private static final long serialVersionUID = 1L;
 	private Integer id;
-	private Integer score;
+	private double score;
 	private String name;
 	private String url;
 	private String parent_url;
@@ -49,20 +49,20 @@ public class Document extends BasicDBObject{
 		tags = new ArrayList<String>();
 		links = new ArrayList<String>();
 		metadata = new HashMap<String, Object>();
-		score = 0;
+		score = 0.0f;
 	}
 
 	public Document(Integer id) {
 		this();
 		this.id = id;
-		score = 0;
+		score = 0.0f;
 	}
 
 	@SuppressWarnings("unchecked")
 	public Document(Map<?, ?> map) {
 		this();
 		this.id = (Integer) map.get("id");
-		this.score = (Integer) map.get("score");
+		this.score = ((Double) map.get("score")).doubleValue();
 		this.name = (String) map.get("name");
 		this.text = (String) map.get("text");
 		this.tags = (ArrayList<String>) map.get("tags");
@@ -73,16 +73,33 @@ public class Document extends BasicDBObject{
 		this.setUrl((String) map.get("url"));
 		this.setParent_url((String) map.get("parent_url"));
 	}
+	
+	@SuppressWarnings("unchecked")
+	public Document(BasicDBObject obj) {
+		this();
+		this.id = obj.getInt("id");
+		this.score =  obj.getDouble("score");
+		this.name = (String) obj.get("name");
+		this.text = (String) obj.get("text");
+		this.tags = (ArrayList<String>) obj.get("tags");
+		this.links = (ArrayList<String>) obj.get("links");
+		this.metadata = (Map<String, Object>) obj.get("metadata");
+		this.images = (ArrayList<String>) obj.get("images");
+		this.date = (Date) obj.get("date");
+		this.setUrl((String) obj.get("url"));
+		this.setParent_url((String) obj.get("parent_url"));
+	}
 
+	
 	public Integer getId() {
 		return id;
 	}
 
-	public void setScore(Integer score) {
-		this.score = score;
+	public void setScore(Float score2) {
+		this.score = score2;
 	}
 
-	public Integer getScore() {
+	public double getScore() {
 		return score;
 	}
 
@@ -190,7 +207,7 @@ public class Document extends BasicDBObject{
 	}
 	
 	public static Document getDocumentFrom(BasicDBObject obj){
-		return new Document(obj.toMap());
+		return new Document(obj);
 	}
 	
 	public static BasicDBObject getBasicDBObjectFromDocument(Document doc){

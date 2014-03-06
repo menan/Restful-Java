@@ -28,7 +28,9 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 
 public class LuceneManager {
 
-	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+//	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+//	private static String INDEX_DIR = "/Users/dynasty/Documents/workspace/data/lucene/root";
+	private static String INDEX_DIR = "/Users/menan/Projects/eclipse-workspace/data/lucene/root";
 
 	int hitsPerPage = 10;
 	
@@ -88,7 +90,6 @@ public class LuceneManager {
 			writer = new IndexWriter(dir, iwc);
 			indexDocuments(writer);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try {
@@ -98,7 +99,6 @@ public class LuceneManager {
 				if (dir != null)
 					dir.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 
 			}
@@ -150,11 +150,14 @@ public class LuceneManager {
 		dir = FSDirectory.open(new File (this.indixing_dir));
     	IndexReader reader = DirectoryReader.open(dir);
     	IndexSearcher searcher = new IndexSearcher(reader);
+    	
 		for (ScoreDoc hit :hits){
 			org.apache.lucene.document.Document indexDoc = searcher.doc(hit.doc);
 			String id = indexDoc.get(edu.carleton.comp4601.assignment2.dao.Document.DOC_ID);
 			if (id != null) {
 				edu.carleton.comp4601.assignment2.dao.Document d = DocumentsManager.getDefault().load(Integer.valueOf(id));
+				d.setScore(hit.score);
+				DocumentsManager.getDefault().updateScore(d.getId(), d.getScore());
 				if (d != null)
 					docs.add(d);
 			}
@@ -181,7 +184,6 @@ public class LuceneManager {
 				if (dir != null)
 					dir.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -191,7 +193,7 @@ public class LuceneManager {
 
 		LuceneManager manager = LuceneManager.getDefault();
 //		manager.reset();
-
+//
 //		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
 //		eclipse_doc.setScore(1);
 //		eclipse_doc.setUrl("http://someurl.edu");
@@ -208,7 +210,7 @@ public class LuceneManager {
 		
 //		manager.index();
 		
-		String search_query = "Eclipse";
+		String search_query = "4601";
 		int docToLoad = -1;
 		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> results =  manager.query(search_query, 20);
 		System.out.println("Search Lucene for : "+search_query + " size="+results.size());
@@ -224,7 +226,7 @@ public class LuceneManager {
 			edu.carleton.comp4601.assignment2.dao.Document aDoc = DocumentsManager.getDefault().load(docToLoad);
 			System.out.println("id :"+aDoc.getId() +" Date :"+aDoc.getCrawledDate());
 			System.out.println("URL :"+aDoc.getUrl() +" Parent_URL :"+aDoc.getParent_url());
-			System.out.println("metadate :"+aDoc.getMetadata().toString());
+//			System.out.println("metadate :"+aDoc.getMetadata().toString());
 
 //			System.out.println("content :"+aDoc.getText());
 		}
@@ -234,6 +236,11 @@ public class LuceneManager {
 
 		System.out.println("	--- Stored Graphs ---	");
 		System.out.println("Graph:"+ GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
+		
+		
+		HITS hits = new HITS(results, GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
+		hits.printScores();
+		
 		
 	}
     
