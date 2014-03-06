@@ -151,11 +151,14 @@ public class LuceneManager {
 		dir = FSDirectory.open(new File (this.indixing_dir));
     	IndexReader reader = DirectoryReader.open(dir);
     	IndexSearcher searcher = new IndexSearcher(reader);
+    	
 		for (ScoreDoc hit :hits){
 			org.apache.lucene.document.Document indexDoc = searcher.doc(hit.doc);
 			String id = indexDoc.get(edu.carleton.comp4601.assignment2.dao.Document.DOC_ID);
 			if (id != null) {
 				edu.carleton.comp4601.assignment2.dao.Document d = DocumentsManager.getDefault().load(Integer.valueOf(id));
+				d.setScore(hit.score);
+				DocumentsManager.getDefault().updateScore(d.getId(), d.getScore());
 				if (d != null)
 					docs.add(d);
 			}
@@ -191,7 +194,7 @@ public class LuceneManager {
 	public static void main(String[] args) {
 
 		LuceneManager manager = LuceneManager.getDefault();
-//		manager.reset();
+		manager.reset();
 
 //		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
 //		eclipse_doc.setScore(1);
@@ -207,7 +210,7 @@ public class LuceneManager {
 //		}
 
 		
-//		manager.index();
+		manager.index();
 		
 //		String search_query = "Eclipse";
 //		int docToLoad = -1;

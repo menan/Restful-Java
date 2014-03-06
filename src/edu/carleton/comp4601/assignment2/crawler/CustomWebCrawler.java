@@ -1,7 +1,6 @@
 package edu.carleton.comp4601.assignment2.crawler;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,7 +11,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import org.apache.lucene.search.ScoreDoc;
 import org.apache.tika.Tika;
 import org.apache.tika.exception.TikaException;
 import org.apache.tika.io.TikaInputStream;
@@ -28,8 +26,6 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.xml.sax.SAXException;
-
 import com.mongodb.BasicDBObject;
 
 import edu.uci.ics.crawler4j.crawler.Page;
@@ -37,10 +33,8 @@ import edu.uci.ics.crawler4j.crawler.WebCrawler;
 import edu.uci.ics.crawler4j.parser.HtmlParseData;
 import edu.uci.ics.crawler4j.url.WebURL;
 
-import edu.carleton.comp4601.assignment2.dao.Document;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
 import edu.carleton.comp4601.assignment2.persistence.GraphManager;
-import edu.carleton.comp4601.assignment2.persistence.LuceneManager;
 
 public class CustomWebCrawler extends WebCrawler {
 
