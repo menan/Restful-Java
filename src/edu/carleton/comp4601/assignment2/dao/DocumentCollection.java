@@ -38,16 +38,27 @@ public class DocumentCollection {
 	 * @return
 	 */
 	public List<Document> search(String tags_string){
-		List<String> 	tags = new ArrayList<String>(Arrays.asList(tags_string.split(":")));
-		List<DBObject> 	resultsObj = DocumentsManager.getDefault().search("tags", tags);
 
-		List<Document> 	results = new ArrayList<Document>();
-		if (resultsObj != null && resultsObj.size() > 0){
-			results = DocumentsManager.convertDBObject(resultsObj);
+		List<Document> 	results = LuceneManager.getDefault().query(tags_string, 20);
+
+		if (results != null && results.size() > 0){
 		}
 		else{
 			System.out.println("no results returned");
 		}
+		
+//		List<String> 	tags = new ArrayList<String>(Arrays.asList(tags_string.split(":")));
+//		List<DBObject> 	resultsObj = DocumentsManager.getDefault().search("tags", tags);
+
+		
+		
+//		List<Document> 	results = new ArrayList<Document>();
+//		if (resultsObj != null && resultsObj.size() > 0){
+//			results = DocumentsManager.convertDBObject(resultsObj);
+//		}
+//		else{
+//			System.out.println("no results returned");
+//		}
 		return results;
 		
 	}

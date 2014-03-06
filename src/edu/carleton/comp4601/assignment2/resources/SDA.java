@@ -20,8 +20,10 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
+import edu.carleton.comp4601.assignment2.crawler.Controller;
 import edu.carleton.comp4601.assignment2.dao.*;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
+import edu.carleton.comp4601.assignment2.persistence.GraphManager;
 import edu.carleton.comp4601.assignment2.utility.SearchServiceManager;
 
 @Path("/sda")
@@ -144,17 +146,38 @@ public class SDA {
 	}
 	
 
-//	@GET
-//	@Path("pagerank")
-//	@Produces(MediaType.TEXT_HTML)
-//	public String listServices() throws UnknownHostException {
-//		String returnStr = SearchServiceManager.getInstance().list().size() + " service(s) found: <br />";
-//		for(ServiceInfo info: SearchServiceManager.getInstance().list()){
-//			returnStr = returnStr.concat("<a href=\"http://" + info.getInetAddresses()[0].toString() + ":8080/COMP4601A2/rest/sda\">" + info.getName() + "</a><br />");
-//		}
-//		return returnStr;
-//	}
-//	
+	@GET
+	@Path("pagerank")
+	@Produces(MediaType.TEXT_HTML)
+	public String listPagesRank() throws UnknownHostException {
+		List<Document> resultsDoc = collection.getDocuments();
+
+		String returnStr = "There are " + resultsDoc.size() + " documents found in the database:<br /><table><tr><td>Page Title</td><td>Page Rank</td></tr>";
+		for(Document d: resultsDoc){
+			returnStr += d.toHTMLWithPageRank();
+		}
+		returnStr += "</table>";
+		return returnStr;
+	}
+
+	@GET
+	@Path("boost")
+	@Produces(MediaType.TEXT_HTML)
+	public String boostPageRank() throws UnknownHostException {
+		GraphManager.getDefault().calculatePageRank(Controller.DEFAULT_CRAWL_GRAPH_ID);
+		String returnStr = "Finished boosting page rank for documents, click <a href=\"/COMP4601SDA/rest/sda/pagerank\">here</a> to view them";
+		return returnStr;
+	}
+	
+	@GET
+	@Path("noboost")
+	@Produces(MediaType.TEXT_HTML)
+	public String noBoostPageRank() throws UnknownHostException {
+		GraphManager.getDefault().noBoost();
+		String returnStr = "Finished unboosting page rank for documents click <a href=\"/COMP4601SDA/rest/sda/pagerank\">here</a> to view them";
+		return returnStr;
+	}
+	
 	@GET
 	@Path("query/{tags}")
 	@Produces(MediaType.APPLICATION_XML)
@@ -182,7 +205,7 @@ public class SDA {
 		}
 
 		List<Document> resultsDoc = collection.search(tags);
-		String returnStr = "Your search returned " + resultsDoc.size() + " results<table>";
+		String returnStr = "Your search for<b> " + tags  + "</b> returned " + resultsDoc.size() + " results<br />";
 		
 		for(Document d: resultsDoc){
 			returnStr += d.toHTML();
@@ -198,16 +221,16 @@ public class SDA {
 	 * @return
 	 * @throws UnknownHostException
 	 */
-	@GET
-	@Path("delete/{tags}")
-	public Response deleteDocuments(@PathParam("tags") String tags) throws UnknownHostException {
-		if(!DocumentsManager.getDefault().deleteAll("tags", tags)){
-			return Response.status(HttpServletResponse.SC_NO_CONTENT).build();
-		}
-		System.out.println("Delete was succussful");
-		return Response.status(HttpServletResponse.SC_OK).build();
-	}
-	
+//	@GET
+//	@Path("delete/{tags}")
+//	public Response deleteDocuments(@PathParam("tags") String tags) throws UnknownHostException {
+//		if(!DocumentsManager.getDefault().deleteAll("tags", tags)){
+//			return Response.status(HttpServletResponse.SC_NO_CONTENT).build();
+//		}
+//		System.out.println("Delete was succussful");
+//		return Response.status(HttpServletResponse.SC_OK).build();
+//	}
+//	
 	/**
 	 * creates a new document and displays the error messages accordingly
 	 * if there is already a document found with the same id, it will tell them to alter it

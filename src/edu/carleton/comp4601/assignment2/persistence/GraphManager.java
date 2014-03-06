@@ -211,16 +211,22 @@ public class GraphManager extends AbstractMongoDBManager{
 			System.out.print("Final Page Rank: ");
 			printMatrix(result);
 
-			for(int i=0; i<nodes.size(); i++){
-				int docid = nodes.get(i);
-				System.out.println("Page: docid="+docid);
-				Document doc = DocumentsManager.getDefault().load(docid);
-				if(doc!= null){
-					System.out.println(" old_score="+doc.getScore());
-					doc.setScore((float) (doc.getScore()*result.get(0, i)));
-					DocumentsManager.getDefault().updateScore(docid, doc.getScore());
+			DBCursor cursor = DocumentsManager.getDefault().getCollectionCursor();
+			while(cursor.hasNext()){
+				BasicDBObject obj = (BasicDBObject) cursor.next();
+				edu.carleton.comp4601.assignment2.dao.Document doc = edu.carleton.comp4601.assignment2.dao.Document.getDocumentFrom(obj);
+		    	System.out.println("trying to pagerank:" + doc.getUrl());
+		    	if(doc != null){
+					System.out.println("Page: docid="+doc.getId()+" old_score="+doc.getScore());
+		    		if(nodes.contains(doc.getId())){
+		    			int index = nodes.indexOf(doc.getId());
+						doc.setScore((float) (doc.getScore()*result.get(0, index)));
+		    		}else{
+						doc.setScore(0.0f);
+		    		}
+					DocumentsManager.getDefault().updateScore(doc.getId(), doc.getScore());
 					System.out.println(" new_score="+doc.getScore());
-				}
+		    	}
 			}
 			
 			System.out.println("Graph: "+g);
@@ -249,6 +255,10 @@ public class GraphManager extends AbstractMongoDBManager{
 		    System.out.println();
 		}
 
+	}
+	
+	public void noBoost(){
+		DocumentsManager.getDefault().updateScore(1);
 	}
 	
 	public static void main(String[] args){

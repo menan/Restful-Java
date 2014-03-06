@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -144,6 +146,8 @@ public class LuceneManager {
 
 
 	public ArrayList<edu.carleton.comp4601.assignment2.dao.Document> getDocs(ScoreDoc[] hits) throws IOException {
+		SortedMap <Double, Integer> map = new TreeMap<Double, Integer>();
+		
 		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> docs = 
 				new ArrayList<edu.carleton.comp4601.assignment2.dao.Document>();
 		
@@ -156,8 +160,8 @@ public class LuceneManager {
 			String id = indexDoc.get(edu.carleton.comp4601.assignment2.dao.Document.DOC_ID);
 			if (id != null) {
 				edu.carleton.comp4601.assignment2.dao.Document d = DocumentsManager.getDefault().load(Integer.valueOf(id));
-				d.setScore(hit.score);
-				DocumentsManager.getDefault().updateScore(d.getId(), d.getScore());
+				d.setIndex(hit.score);
+				DocumentsManager.getDefault().updateIndex(d.getId(), d.getIndex());
 				if (d != null)
 					docs.add(d);
 			}
@@ -165,6 +169,8 @@ public class LuceneManager {
 		return docs;
 	}
 
+	
+	
 	
 	public boolean reset() {
 		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_46, analyzer);
@@ -192,7 +198,8 @@ public class LuceneManager {
 	public static void main(String[] args) {
 
 		LuceneManager manager = LuceneManager.getDefault();
-//		manager.reset();
+
+		manager.reset();
 //
 //		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
 //		eclipse_doc.setScore(1);
@@ -208,7 +215,7 @@ public class LuceneManager {
 //		}
 
 		
-//		manager.index();
+		manager.index();
 		
 		String search_query = "4601";
 		int docToLoad = -1;

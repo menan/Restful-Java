@@ -135,6 +135,8 @@ public class CustomWebCrawler extends WebCrawler {
 			Elements hTags = jsoup_doc.select("h1, h2, h3, h4");
 			Elements jsoup_text = new Elements(paragraphs);
 			jsoup_text.addAll(hTags);
+			
+			String title = jsoup_doc.getElementsByTag("title").text();
 
 			// Add page to db
 			doc = new BasicDBObject();
@@ -169,6 +171,8 @@ public class CustomWebCrawler extends WebCrawler {
 			// + ", images size:" + images.size());
 			doc.append("images", images);
 			doc.append("tags", tags);
+		    doc.append("title", title);
+		    doc.append("name", title);
 			// links
 			List<String> links = new ArrayList<>();
 			for (Element e : jsoup_links) {
@@ -244,6 +248,8 @@ public class CustomWebCrawler extends WebCrawler {
 
 		    doc.append("metadata", mongoDB_metadata);
 		    doc.append("text", textHandler.toString());
+		    doc.append("title", metadata.get("title"));
+		    doc.append("name", metadata.get("title"));
 		    
         	System.out.println("Gonna parse url: " + url);
         	
