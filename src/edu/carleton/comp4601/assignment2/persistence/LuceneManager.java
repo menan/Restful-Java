@@ -30,9 +30,9 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 
 public class LuceneManager {
 
-//	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
 //	private static String INDEX_DIR = "/Users/dynasty/Documents/workspace/data/lucene/root";
-	private static String INDEX_DIR = "/Users/menan/Projects/eclipse-workspace/data/lucene/root";
+//	private static String INDEX_DIR = "/Users/menan/Projects/eclipse-workspace/data/lucene/root";
 
 	int hitsPerPage = 10;
 	
@@ -160,10 +160,11 @@ public class LuceneManager {
 			String id = indexDoc.get(edu.carleton.comp4601.assignment2.dao.Document.DOC_ID);
 			if (id != null) {
 				edu.carleton.comp4601.assignment2.dao.Document d = DocumentsManager.getDefault().load(Integer.valueOf(id));
-				d.setIndex(hit.score);
-				DocumentsManager.getDefault().updateIndex(d.getId(), d.getIndex());
-				if (d != null)
+				if (d != null){
+					d.setIndex(hit.score);
+					DocumentsManager.getDefault().updateIndex(d.getId(), d.getIndex());
 					docs.add(d);
+				}
 			}
 		}
 		return docs;
@@ -200,9 +201,7 @@ public class LuceneManager {
 		LuceneManager manager = LuceneManager.getDefault();
 
 		manager.reset();
-//
 //		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
-//		eclipse_doc.setScore(1);
 //		eclipse_doc.setUrl("http://someurl.edu");
 //		eclipse_doc.setText("Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
 //				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
@@ -217,7 +216,7 @@ public class LuceneManager {
 		
 		manager.index();
 		
-		String search_query = "4601";
+		String search_query = "Eclipse";
 		int docToLoad = -1;
 		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> results =  manager.query(search_query, 20);
 		System.out.println("Search Lucene for : "+search_query + " size="+results.size());
@@ -225,7 +224,7 @@ public class LuceneManager {
 			for(int i=0; i < results.size(); i++){
 				if(i==0)
 					docToLoad = results.get(i).getId();
-				System.out.println("	> ("+results.get(i).getId()+") "+results.get(i).getUrl()+" [score="+results.get(i).getScore()+"]");
+				System.out.println("	> ("+results.get(i).getId()+") "+results.get(i).getUrl()+" [score="+results.get(i).getScore()+" index="+results.get(i).getIndex()+"]");
 			}
 		}
 
@@ -245,8 +244,8 @@ public class LuceneManager {
 		System.out.println("Graph:"+ GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
 		
 		
-		HITS hits = new HITS(results, GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
-		hits.printScores();
+//		HITS hits = new HITS(results, GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
+//		hits.printScores();
 		
 		
 	}

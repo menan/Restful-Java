@@ -75,7 +75,6 @@ public class CustomWebCrawler extends WebCrawler {
     @Override
     public void onBeforeExit(){
 //    	storeGraph();
-    	calculatePageRank();
     }
 	
     /**
@@ -269,22 +268,6 @@ public class CustomWebCrawler extends WebCrawler {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} // close the stream
-		}
-    }
-
-    public void calculatePageRank(){
-//		DirectedGraph<Integer, DefaultEdge> newG = GraphManager.getDefault().loadGraph();
-		
-		for(int v: g.vertexSet()){
-			System.out.println("vertex: " + v + "("+"), rank:" + pageRank(v));
-			boolean updated = DocumentsManager.getDefault().updateScore(v, pageRank(v));
-			if(updated)
-				System.out.println("updated the score on the database as well");
-			else
-				System.out.println("Error updating the score to the db");
-				
-			
-			
 		}
     }
     
