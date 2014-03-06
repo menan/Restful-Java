@@ -151,7 +151,7 @@ public class SDA {
 	@Produces(MediaType.TEXT_HTML)
 	public String listPagesRank() throws UnknownHostException {
 		List<Document> resultsDoc = collection.getDocuments();
-
+		resultsDoc = collection.sort(resultsDoc);
 		String returnStr = "There are " + resultsDoc.size() + " documents found in the database:<br /><table><tr><td>Page Title</td><td>Page Rank</td></tr>";
 		for(Document d: resultsDoc){
 			returnStr += d.toHTMLWithPageRank();
@@ -184,6 +184,7 @@ public class SDA {
 	public List<Document> searchDocuments(@PathParam("tags") String tags) throws UnknownHostException {
 		List<Document> resultsDoc = new ArrayList<Document>();
 		resultsDoc = collection.search(tags);
+		resultsDoc = collection.sort(resultsDoc);
 		return resultsDoc;
 	}
 	
@@ -205,6 +206,7 @@ public class SDA {
 		}
 
 		List<Document> resultsDoc = collection.search(tags);
+		resultsDoc = collection.sort(resultsDoc);
 		String returnStr = "Your search for<b> " + tags  + "</b> returned " + resultsDoc.size() + " results<br />";
 		
 		for(Document d: resultsDoc){

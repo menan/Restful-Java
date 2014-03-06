@@ -30,9 +30,9 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 
 public class LuceneManager {
 
-	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+//	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
 //	private static String INDEX_DIR = "/Users/dynasty/Documents/workspace/data/lucene/root";
-//	private static String INDEX_DIR = "/Users/menan/Projects/eclipse-workspace/data/lucene/root";
+	private static String INDEX_DIR = "/Users/menan/Projects/eclipse-workspace/data/lucene/root";
 
 	int hitsPerPage = 10;
 	

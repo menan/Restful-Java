@@ -216,7 +216,7 @@ public class Document extends BasicDBObject{
 	}
 	
 	public String toHTML(){
-		return "<a href=\"" + getUrl() + "\"><b>" + name + "</b></a><div style=\"color:green\"><i>" + getUrl() +"</i></div><div style=\"color:gray\">" + getText().substring(0,500) +"</div> <br /><br />";
+		return "<a href=\"" + getUrl() + "\"><b>" + name + "</b></a><div style=\"color:green\"><i>" + getUrl() +"</i></div><div style=\"color:gray\">" + getText().substring(0,500) +"</div> <div style=\"color:gray\">Score: <b>" + getScore() +"</b></div> <br /><br />";
 		
 	}
 

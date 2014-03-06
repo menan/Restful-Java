@@ -2,6 +2,8 @@ package edu.carleton.comp4601.assignment2.dao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -49,9 +51,6 @@ public class DocumentCollection {
 		
 //		List<String> 	tags = new ArrayList<String>(Arrays.asList(tags_string.split(":")));
 //		List<DBObject> 	resultsObj = DocumentsManager.getDefault().search("tags", tags);
-
-		
-		
 //		List<Document> 	results = new ArrayList<Document>();
 //		if (resultsObj != null && resultsObj.size() > 0){
 //			results = DocumentsManager.convertDBObject(resultsObj);
@@ -61,6 +60,22 @@ public class DocumentCollection {
 //		}
 		return results;
 		
+	}
+	
+	public List<Document> sort(List<Document> docs){
+		if(docs != null && docs.size() > 0){
+
+			Collections.sort(docs, new Comparator<Document>(){
+			    @Override
+			    public int compare(Document d1, Document d2) {
+			    	if(d1 != null && d2 != null)
+			    		return Double.compare(d2.getScore(),d1.getScore());
+			    	else
+			    		return 0;
+			    }
+			});
+		}
+		return docs;
 	}
 
 	/**
