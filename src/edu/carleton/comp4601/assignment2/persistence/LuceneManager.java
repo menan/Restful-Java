@@ -30,7 +30,9 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 
 public class LuceneManager {
 
-	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+//	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+//	private static String INDEX_DIR = "/Users/dynasty/Documents/workspace/data/lucene/root";
+	private static String INDEX_DIR = "/Users/menan/Projects/eclipse-workspace/data/lucene/root";
 
 	int hitsPerPage = 10;
 	
@@ -90,7 +92,6 @@ public class LuceneManager {
 			writer = new IndexWriter(dir, iwc);
 			indexDocuments(writer);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			try {
@@ -100,7 +101,6 @@ public class LuceneManager {
 				if (dir != null)
 					dir.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 
 			}
@@ -190,7 +190,6 @@ public class LuceneManager {
 				if (dir != null)
 					dir.close();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -199,25 +198,26 @@ public class LuceneManager {
 	public static void main(String[] args) {
 
 		LuceneManager manager = LuceneManager.getDefault();
-		manager.reset();
 
-		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
-		eclipse_doc.setScore(0.0f);
-		eclipse_doc.setUrl("http://someurl.edu");
-		eclipse_doc.setText("Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
-				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
-				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse ");
-		DocumentsManager.getDefault().save(eclipse_doc);
-		List<edu.carleton.comp4601.assignment2.dao.Document> searchedDocs = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", "Eclipse", false));
-		for(edu.carleton.comp4601.assignment2.dao.Document d : searchedDocs){
-			if(d.getId().intValue() == 999999)
-				System.out.println("eclipse_doc was added");
-		}
+//		manager.reset();
+//
+//		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
+//		eclipse_doc.setScore(1);
+//		eclipse_doc.setUrl("http://someurl.edu");
+//		eclipse_doc.setText("Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
+//				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
+//				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse ");
+//		DocumentsManager.getDefault().save(eclipse_doc);
+//		List<edu.carleton.comp4601.assignment2.dao.Document> searchedDocs = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", "Eclipse", false));
+//		for(edu.carleton.comp4601.assignment2.dao.Document d : searchedDocs){
+//			if(d.getId().intValue() == 999999)
+//				System.out.println("eclipse_doc was added");
+//		}
 
 		
-		manager.index();
+//		manager.index();
 		
-		String search_query = "Eclipse";
+		String search_query = "4601";
 		int docToLoad = -1;
 		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> results =  manager.query(search_query, 20);
 		System.out.println("Search Lucene for : "+search_query + " size="+results.size());
@@ -233,7 +233,7 @@ public class LuceneManager {
 			edu.carleton.comp4601.assignment2.dao.Document aDoc = DocumentsManager.getDefault().load(docToLoad);
 			System.out.println("id :"+aDoc.getId() +" Date :"+aDoc.getCrawledDate());
 			System.out.println("URL :"+aDoc.getUrl() +" Parent_URL :"+aDoc.getParent_url());
-			System.out.println("metadate :"+aDoc.getMetadata().toString());
+//			System.out.println("metadate :"+aDoc.getMetadata().toString());
 
 //			System.out.println("content :"+aDoc.getText());
 		}
@@ -243,6 +243,11 @@ public class LuceneManager {
 
 		System.out.println("	--- Stored Graphs ---	");
 		System.out.println("Graph:"+ GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
+		
+		
+		HITS hits = new HITS(results, GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
+		hits.printScores();
+		
 		
 	}
     

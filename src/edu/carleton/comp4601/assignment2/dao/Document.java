@@ -51,6 +51,7 @@ public class Document extends BasicDBObject{
 		links = new ArrayList<String>();
 		metadata = new HashMap<String, Object>();
 		score = 0.0f;
+		index = 0.0f;
 	}
 
 	public Document(Integer id) {

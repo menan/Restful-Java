@@ -160,6 +160,7 @@ public class GraphManager extends AbstractMongoDBManager{
 		return save(obj);
 	}
 	
+
 	@SuppressWarnings("unchecked")	
 	public void calculatePageRank(int graph_id){
 		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> results = new ArrayList<>();
