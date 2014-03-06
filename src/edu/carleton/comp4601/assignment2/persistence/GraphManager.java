@@ -150,5 +150,9 @@ public class GraphManager extends AbstractMongoDBManager{
 		}
 		return save(obj);
 	}
+	
+	public void computeHITS(int id){
+		
+	}
 
 }

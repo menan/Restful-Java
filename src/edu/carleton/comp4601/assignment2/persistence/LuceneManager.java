@@ -28,7 +28,8 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 
 public class LuceneManager {
 
-	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+//	private static String INDEX_DIR = "/Users/abdulrahmanalamoudi/Desktop/temp/index";
+	private static String INDEX_DIR = "/Users/dynasty/Documents/workspace/data/lucene/root";
 
 	int hitsPerPage = 10;
 	
@@ -208,32 +209,37 @@ public class LuceneManager {
 		
 //		manager.index();
 		
-		String search_query = "Eclipse";
-		int docToLoad = -1;
-		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> results =  manager.query(search_query, 20);
-		System.out.println("Search Lucene for : "+search_query + " size="+results.size());
-		if(results != null){
-			for(int i=0; i < results.size(); i++){
-				if(i==0)
-					docToLoad = results.get(i).getId();
-				System.out.println("	> ("+results.get(i).getId()+") "+results.get(i).getUrl()+" [score="+results.get(i).getScore()+"]");
-			}
-		}
-
-		if(docToLoad > -1){
-			edu.carleton.comp4601.assignment2.dao.Document aDoc = DocumentsManager.getDefault().load(docToLoad);
-			System.out.println("id :"+aDoc.getId() +" Date :"+aDoc.getCrawledDate());
-			System.out.println("URL :"+aDoc.getUrl() +" Parent_URL :"+aDoc.getParent_url());
-			System.out.println("metadate :"+aDoc.getMetadata().toString());
-
-//			System.out.println("content :"+aDoc.getText());
-		}
-		
-		List<edu.carleton.comp4601.assignment2.dao.Document> results2 = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", search_query, false));
-		System.out.println("Search MongoDB [text] for : "+search_query + " size="+results2.size());
+//		String search_query = "Eclipse";
+//		int docToLoad = -1;
+//		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> results =  manager.query(search_query, 20);
+//		System.out.println("Search Lucene for : "+search_query + " size="+results.size());
+//		if(results != null){
+//			for(int i=0; i < results.size(); i++){
+//				if(i==0)
+//					docToLoad = results.get(i).getId();
+//				System.out.println("	> ("+results.get(i).getId()+") "+results.get(i).getUrl()+" [score="+results.get(i).getScore()+"]");
+//			}
+//		}
+//
+//		if(docToLoad > -1){
+//			edu.carleton.comp4601.assignment2.dao.Document aDoc = DocumentsManager.getDefault().load(docToLoad);
+//			System.out.println("id :"+aDoc.getId() +" Date :"+aDoc.getCrawledDate());
+//			System.out.println("URL :"+aDoc.getUrl() +" Parent_URL :"+aDoc.getParent_url());
+//			System.out.println("metadate :"+aDoc.getMetadata().toString());
+//
+////			System.out.println("content :"+aDoc.getText());
+//		}
+//		
+//		List<edu.carleton.comp4601.assignment2.dao.Document> results2 = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", search_query, false));
+//		System.out.println("Search MongoDB [text] for : "+search_query + " size="+results2.size());
 
 		System.out.println("	--- Stored Graphs ---	");
 		System.out.println("Graph:"+ GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
+		
+		
+		HITS hits = new HITS(GraphManager.getDefault().loadGraph(Controller.DEFAULT_CRAWL_GRAPH_ID));
+		
+		
 		
 	}
     
