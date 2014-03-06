@@ -134,11 +134,22 @@ public class DocumentsManager extends AbstractMongoDBManager {
 
 	}
 	
+	
+//	public List<Document> getSortedScoredDocuments{
+//		DBCursor cursor = collection.find().sort( new BasicDBObject( "score" , -1 ));
+//	}
+	
 	public boolean updateScore(int id, double d){
 		BasicDBObject query = new BasicDBObject("id",id);
 		return DocumentsManager.getDefault().update("score", d, query);
 	}
 
+	public boolean updateIndex(int id, double index){
+		BasicDBObject query = new BasicDBObject("id",id);
+		return DocumentsManager.getDefault().update("index", index, query);
+	}
+
+	
 	public boolean save(Document a){
 		return this.add(a).getLastError().ok();
 	}

@@ -35,6 +35,7 @@ public class Document extends BasicDBObject{
 	private static final long serialVersionUID = 1L;
 	private Integer id;
 	private double score;
+	private double index;
 	private String name;
 	private String url;
 	private String parent_url;
@@ -63,6 +64,8 @@ public class Document extends BasicDBObject{
 		this();
 		this.id = (Integer) map.get("id");
 		this.score = ((Double) map.get("score")).doubleValue();
+		if(map.containsKey("index"))
+			this.index = ((Double) map.get("index")).doubleValue();
 		this.name = (String) map.get("name");
 		this.text = (String) map.get("text");
 		this.tags = (ArrayList<String>) map.get("tags");
@@ -79,6 +82,8 @@ public class Document extends BasicDBObject{
 		this();
 		this.id = obj.getInt("id");
 		this.score =  obj.getDouble("score");
+		if(obj.containsField("index"))
+			this.index =  obj.getDouble("index");
 		this.name = (String) obj.get("name");
 		this.text = (String) obj.get("text");
 		this.tags = (ArrayList<String>) obj.get("tags");
@@ -101,6 +106,14 @@ public class Document extends BasicDBObject{
 
 	public double getScore() {
 		return score;
+	}
+
+	public double getIndex() {
+		return index;
+	}
+
+	public void setIndex(Float index) {
+		this.index = index;
 	}
 
 	public void setId(Integer id) {
@@ -219,6 +232,7 @@ public class Document extends BasicDBObject{
 		obj.put("links", doc.getLinks());
 		obj.put("date", doc.getCrawledDate());
 		obj.put("score", doc.getScore());
+		obj.put("index", doc.getIndex());
 		obj.put("metadata", doc.getMetadata());
 		obj.put("parent_url", doc.getParent_url());
 		

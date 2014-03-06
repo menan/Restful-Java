@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
@@ -144,6 +146,8 @@ public class LuceneManager {
 
 
 	public ArrayList<edu.carleton.comp4601.assignment2.dao.Document> getDocs(ScoreDoc[] hits) throws IOException {
+		SortedMap <Double, Integer> map = new TreeMap<Double, Integer>();
+		
 		ArrayList<edu.carleton.comp4601.assignment2.dao.Document> docs = 
 				new ArrayList<edu.carleton.comp4601.assignment2.dao.Document>();
 		
@@ -156,8 +160,8 @@ public class LuceneManager {
 			String id = indexDoc.get(edu.carleton.comp4601.assignment2.dao.Document.DOC_ID);
 			if (id != null) {
 				edu.carleton.comp4601.assignment2.dao.Document d = DocumentsManager.getDefault().load(Integer.valueOf(id));
-				d.setScore(hit.score);
-				DocumentsManager.getDefault().updateScore(d.getId(), d.getScore());
+				d.setIndex(hit.score);
+				DocumentsManager.getDefault().updateIndex(d.getId(), d.getIndex());
 				if (d != null)
 					docs.add(d);
 			}
@@ -165,6 +169,8 @@ public class LuceneManager {
 		return docs;
 	}
 
+	
+	
 	
 	public boolean reset() {
 		IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_46, analyzer);
@@ -195,18 +201,18 @@ public class LuceneManager {
 		LuceneManager manager = LuceneManager.getDefault();
 		manager.reset();
 
-//		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
-//		eclipse_doc.setScore(1);
-//		eclipse_doc.setUrl("http://someurl.edu");
-//		eclipse_doc.setText("Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
-//				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
-//				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse ");
-//		DocumentsManager.getDefault().save(eclipse_doc);
-//		List<edu.carleton.comp4601.assignment2.dao.Document> searchedDocs = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", "Eclipse", false));
-//		for(edu.carleton.comp4601.assignment2.dao.Document d : searchedDocs){
-//			if(d.getId().intValue() == 999999)
-//				System.out.println("eclipse_doc was added");
-//		}
+		edu.carleton.comp4601.assignment2.dao.Document eclipse_doc = new edu.carleton.comp4601.assignment2.dao.Document(new Integer (999999));
+		eclipse_doc.setScore(0.0f);
+		eclipse_doc.setUrl("http://someurl.edu");
+		eclipse_doc.setText("Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
+				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse "+
+				"Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse Eclipse ");
+		DocumentsManager.getDefault().save(eclipse_doc);
+		List<edu.carleton.comp4601.assignment2.dao.Document> searchedDocs = DocumentsManager.convertDBObject(DocumentsManager.getDefault().search("text", "Eclipse", false));
+		for(edu.carleton.comp4601.assignment2.dao.Document d : searchedDocs){
+			if(d.getId().intValue() == 999999)
+				System.out.println("eclipse_doc was added");
+		}
 
 		
 		manager.index();
