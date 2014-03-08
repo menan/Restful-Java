@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -41,7 +43,7 @@ public class DocumentCollection {
 	 */
 	public List<Document> search(String tags_string){
 
-		List<Document> 	results = LuceneManager.getDefault().query(tags_string, 20);
+		List<Document> 	results = LuceneManager.getDefault().query(tags_string, 100);
 
 		if (results != null && results.size() > 0){
 		}
@@ -62,18 +64,25 @@ public class DocumentCollection {
 		
 	}
 	
-	public List<Document> sort(List<Document> docs){
+	public List<Document> scoreSort(List<Document> docs){
 		if(docs != null && docs.size() > 0){
+			Set<Document> docSet = new TreeSet<Document>(new docidComparator()); // to eliminate duplicates
+			docSet.addAll(docs);
+			List<Document> result= new ArrayList<Document>(docSet);
+			Collections.sort(result, new ScoreComparator()); // to sort docs based on score
 
-			Collections.sort(docs, new Comparator<Document>(){
-			    @Override
-			    public int compare(Document d1, Document d2) {
-			    	if(d1 != null && d2 != null)
-			    		return Double.compare(d2.getScore(),d1.getScore());
-			    	else
-			    		return 0;
-			    }
-			});
+			return result;
+		}
+		return docs;
+
+	}
+	
+	public List<Document> authoritySort(List<Document> docs){
+		if(docs != null && docs.size() > 0){
+			Collections.sort(docs, new AuthorityComparator()); // to sort docs based on score
+			Set<Document> docSet = new TreeSet<Document>(new docidComparator()); // to eliminate duplicates
+			docSet.addAll(docs);
+			return new ArrayList<Document>(docSet);
 		}
 		return docs;
 	}
@@ -160,4 +169,37 @@ public class DocumentCollection {
 	public boolean reset(){
 		return DocumentsManager.getDefault().deleteAll(); // && LuceneManager.getDefault().reset();
 	}
+	
+	private class ScoreComparator implements Comparator<Document>{
+	    @Override
+	    public int compare(Document d1, Document d2) {
+	    	if(d1 != null && d2 != null)
+	    		return Double.compare(d2.getScore(),d1.getScore());
+	    	else
+	    		return 0;
+	    }
+	}
+	
+	private class AuthorityComparator implements Comparator<Document>{
+	    @Override
+	    public int compare(Document d1, Document d2) {
+	    	if(d1 != null && d2 != null)
+	    		return Double.compare(d2.getAuthority(),d1.getAuthority());
+	    	else
+	    		return 0;
+	    }
+	}
+	
+	private class docidComparator implements Comparator<Document>{
+	    @Override
+	    public int compare(Document d1, Document d2) {
+	    	if(d1 != null && d2 != null)
+	    		return Double.compare(d2.getId(),d1.getId());
+	    	else
+	    		return 0;
+	    }
+	}
+	
+	
+	
 }

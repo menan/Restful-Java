@@ -144,7 +144,7 @@ public class DocumentsManager extends AbstractMongoDBManager {
 		return DocumentsManager.getDefault().update("score", d, query);
 	}
 
-	public boolean updateScore(double d){
+	public boolean updateAllScores(double d){
 		BasicDBObject query = new BasicDBObject();
 		return DocumentsManager.getDefault().updateAll("score", d, query);
 	}

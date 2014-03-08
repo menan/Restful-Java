@@ -24,6 +24,7 @@ import edu.carleton.comp4601.assignment2.crawler.Controller;
 import edu.carleton.comp4601.assignment2.dao.*;
 import edu.carleton.comp4601.assignment2.persistence.DocumentsManager;
 import edu.carleton.comp4601.assignment2.persistence.GraphManager;
+import edu.carleton.comp4601.assignment2.persistence.LuceneManager;
 import edu.carleton.comp4601.assignment2.utility.SearchServiceManager;
 
 @Path("/sda")
@@ -140,7 +141,7 @@ public class SDA {
 	public String listServices() throws UnknownHostException {
 		String returnStr = SearchServiceManager.getInstance().list().size() + " service(s) found: <br />";
 		for(ServiceInfo info: SearchServiceManager.getInstance().list()){
-			returnStr = returnStr.concat("<a href=\"http://" + info.getInetAddresses()[0].toString() + ":8080/COMP4601A2/rest/sda\">" + info.getName() + "</a><br />");
+			returnStr = returnStr.concat("<a href=\"http://" + info.getInetAddresses()[0].toString() + ":8080/COMP4601SDA/rest/sda\">" + info.getName() + "</a><br />");
 		}
 		return returnStr;
 	}
@@ -151,7 +152,7 @@ public class SDA {
 	@Produces(MediaType.TEXT_HTML)
 	public String listPagesRank() throws UnknownHostException {
 		List<Document> resultsDoc = collection.getDocuments();
-		resultsDoc = collection.sort(resultsDoc);
+		resultsDoc = collection.scoreSort(resultsDoc);
 		String returnStr = "There are " + resultsDoc.size() + " documents found in the database:<br /><table><tr><td>Page Title</td><td>Page Rank</td></tr>";
 		for(Document d: resultsDoc){
 			returnStr += d.toHTMLWithPageRank();
@@ -164,6 +165,7 @@ public class SDA {
 	@Path("boost")
 	@Produces(MediaType.TEXT_HTML)
 	public String boostPageRank() throws UnknownHostException {
+		LuceneManager.getDefault().index();
 		GraphManager.getDefault().calculatePageRank(Controller.DEFAULT_CRAWL_GRAPH_ID);
 		String returnStr = "Finished boosting page rank for documents, click <a href=\"/COMP4601SDA/rest/sda/pagerank\">here</a> to view them";
 		return returnStr;
@@ -173,6 +175,7 @@ public class SDA {
 	@Path("noboost")
 	@Produces(MediaType.TEXT_HTML)
 	public String noBoostPageRank() throws UnknownHostException {
+		LuceneManager.getDefault().index();
 		GraphManager.getDefault().noBoost();
 		String returnStr = "Finished unboosting page rank for documents click <a href=\"/COMP4601SDA/rest/sda/pagerank\">here</a> to view them";
 		return returnStr;
@@ -184,7 +187,7 @@ public class SDA {
 	public List<Document> searchDocuments(@PathParam("tags") String tags) throws UnknownHostException {
 		List<Document> resultsDoc = new ArrayList<Document>();
 		resultsDoc = collection.search(tags);
-		resultsDoc = collection.sort(resultsDoc);
+		resultsDoc = collection.scoreSort(resultsDoc);
 		return resultsDoc;
 	}
 	
@@ -199,14 +202,14 @@ public class SDA {
 	@GET
 	@Path("query/{tags}")
 	@Produces(MediaType.TEXT_HTML)
-	public String searchDocumentsHTML(@PathParam("tags") String tags) throws UnknownHostException {
+	public String searchDocumentsHTML(@PathParam("tags") String tags) throws UnknownHostException {		
 		if (tags == null || tags.isEmpty()){
 			System.out.println("No query entered");
 			return "Please enter a query to search";
 		}
 
 		List<Document> resultsDoc = collection.search(tags);
-		resultsDoc = collection.sort(resultsDoc);
+		resultsDoc = collection.scoreSort(resultsDoc);
 		String returnStr = "Your search for<b> " + tags  + "</b> returned " + resultsDoc.size() + " results<br />";
 		
 		for(Document d: resultsDoc){

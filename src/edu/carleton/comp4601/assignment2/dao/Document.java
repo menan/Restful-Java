@@ -36,6 +36,8 @@ public class Document extends BasicDBObject{
 	private Integer id;
 	private double score;
 	private double index;
+	private double hub;
+	private double authority;
 	private String name;
 	private String url;
 	private String parent_url;
@@ -52,12 +54,17 @@ public class Document extends BasicDBObject{
 		metadata = new HashMap<String, Object>();
 		score = 0.0f;
 		index = 0.0f;
+		hub = 0.0f;
+		authority = 0.0f;
 	}
 
 	public Document(Integer id) {
 		this();
 		this.id = id;
 		score = 0.0f;
+		index = 0.0f;
+		hub = 0.0f;
+		authority = 0.0f;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -67,6 +74,10 @@ public class Document extends BasicDBObject{
 		this.score = ((Double) map.get("score")).doubleValue();
 		if(map.containsKey("index"))
 			this.index = ((Double) map.get("index")).doubleValue();
+		if(map.containsKey("hub"))
+			this.hub = ((Double) map.get("hub")).doubleValue();
+		if(map.containsKey("authority"))
+			this.authority = ((Double) map.get("authority")).doubleValue();
 		this.name = (String) map.get("name");
 		this.text = (String) map.get("text");
 		this.tags = (ArrayList<String>) map.get("tags");
@@ -85,6 +96,10 @@ public class Document extends BasicDBObject{
 		this.score =  obj.getDouble("score");
 		if(obj.containsField("index"))
 			this.index =  obj.getDouble("index");
+		if(obj.containsField("hub"))
+			this.hub = obj.getDouble("hub");
+		if(obj.containsField("authority"))
+			this.authority = obj.getDouble("authority");
 		this.name = (String) obj.get("name");
 		this.text = (String) obj.get("text");
 		this.tags = (ArrayList<String>) obj.get("tags");
@@ -115,6 +130,22 @@ public class Document extends BasicDBObject{
 
 	public void setIndex(Float index) {
 		this.index = index;
+	}
+
+	public double getHub() {
+		return hub;
+	}
+
+	public void setHub(Float hub) {
+		this.hub = hub;
+	}
+
+	public double getAuthority() {
+		return authority;
+	}
+
+	public void setAuthority(Float authority) {
+		this.authority = authority;
 	}
 
 	public void setId(Integer id) {
@@ -216,12 +247,12 @@ public class Document extends BasicDBObject{
 	}
 	
 	public String toHTML(){
-		return "<a href=\"" + getUrl() + "\"><b>" + name + "</b></a><div style=\"color:green\"><i>" + getUrl() +"</i></div><div style=\"color:gray\">" + getText().substring(0,500) +"</div> <div style=\"color:gray\">Score: <b>" + getScore() +"</b></div> <br /><br />";
+		return "<a href=\"" + getSDALink() + "\"><b>" + getId() + "</b></a><div style=\"color:green\"><i>" + getUrl() +"</i></div><div style=\"color:gray\">" + getText() +"</div> <div style=\"color:gray\">Score: <b>" + getScore() +"</b></div> <br /><br />";
 		
 	}
 
 	public String toHTMLWithPageRank(){
-		return "<tr><td><a href=\"" + getUrl() + "\"><b>" + name + "</b></a></td><td> " +getScore() +"</td></tr>";
+		return "<tr><td><a href=\"" + getSDALink() + "\"><b>" + getId() + "</b></a></td><td> " +getScore() +"</td></tr>";
 		
 	}
 	
@@ -233,14 +264,17 @@ public class Document extends BasicDBObject{
 		BasicDBObject obj = new BasicDBObject("id", doc.getId());
 		obj.put("name", doc.getName());
 		obj.put("url", doc.getUrl());
-		obj.put("text", doc.getText());
-		obj.put("tags", doc.getTags());
-		obj.put("links", doc.getLinks());
+		obj.put("parent_url", doc.getParent_url());
 		obj.put("date", doc.getCrawledDate());
 		obj.put("score", doc.getScore());
 		obj.put("index", doc.getIndex());
+		obj.put("hub", doc.getHub());
+		obj.put("authority", doc.getAuthority());
 		obj.put("metadata", doc.getMetadata());
-		obj.put("parent_url", doc.getParent_url());
+		obj.put("text", doc.getText());
+		obj.put("tags", doc.getTags());
+		obj.put("links", doc.getLinks());
+		
 		
 //		System.out.println("getBasicDBObjectFromDocument Testing Resutl Before Returning it");
 //		System.out.println("Passed Doc: "+doc.toString());		
@@ -263,6 +297,9 @@ public class Document extends BasicDBObject{
 //		lucene_doc.add(new TextField(CONTENT, content, Field.Store.YES));
 		lucene_doc.add(new	TextField(CONTENT,	
 				new	BufferedReader(new InputStreamReader(new ByteArrayInputStream(doc.getText().getBytes()), "UTF-8"))));
+		if(doc.getTags() != null)
+			lucene_doc.add(new TextField(CONTENT, doc.getTags().toString(), Field.Store.YES));
+
 		if(doc.getMetadata() != null)
 			lucene_doc.add(new TextField(METADATA, doc.getMetadata().toString(), Field.Store.NO));
 		return lucene_doc;
